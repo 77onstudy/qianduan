@@ -110,11 +110,11 @@
 				this.$axios.post('UserController/saveUser', this.$qs.stringify(
 					this.user
 				)).then(response => {
-					if (response.data > 0) {
-						alert('注册成功！');
+					if (!response.data.code) {
+						
 						this.$router.go(-1);
 					} else {
-						alert('注册失败！');
+						alert(response.data.message);
 					}
 				}).catch(error => {
 					console.error(error);

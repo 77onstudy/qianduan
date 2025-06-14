@@ -14,7 +14,7 @@
 			<p>{{business.businessExplain}}</p>
 		</div>
 
-		<ul class="food">
+		<div class="food">
 			<template v-for="(item,index) in foodArr" :key="item.foodId || index">
 				<div class="food-left">
 					<img v-if="item.foodImg" :src="item.foodImg" :alt="item.foodName">
@@ -42,7 +42,7 @@
 					<p class="small-tip">请稍后再来看看</p>
 				</div>
 			</li>
-		</ul>
+		</div>
 
 		<div class="cart">
 			<div class="cart-left">

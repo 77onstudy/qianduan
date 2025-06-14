@@ -12,7 +12,7 @@
 					商家ID：
 				</div>
 				<div class="content">
-					<input type="text" v-model="userId" placeholder="商家ID">
+					<input type="text" v-model="sellerId" placeholder="商家ID">
 				</div>
 			</li>
 			<li>
@@ -48,7 +48,7 @@
 		name: 'sellerLogin',
 		data() {
 			return {
-				userId: '',
+				sellerId: '',
 				password: '',
 				seller:{
 					sellerId:"777",
@@ -56,7 +56,7 @@
 					password:"777",
 					businessName:"777",
 					sellerSex:1,
-					delTag:"",
+					
 					
 
 				},
@@ -64,33 +64,32 @@
 		},
 		methods: {
 			login() {
-				if (this.userId == '') {
-					alert('用户ID不能为空！');
+				if (this.sellerId == '') {
+					alert('商家ID不能为空！');
 					return;
 				}
 				if (this.password == '') {
 					alert('密码不能为空！');
 					return;
 				}
-				this.$setSessionStorage('seller', this.seller);
-				this.$router.go(-1);
+				
 				// 登录请求
-				// this.$axios.post('SellerController/getSellerByIdByPass', this.$qs.stringify({
-				// 	userId: this.userId,
-				// 	password: this.password
-				// })).then(response => {
-				// 	let user = response.data.data;
-				// 	if (user == null) {
-				// 		alert('用户名或密码不正确！');
-				// 	} else {
-				// 		// sessionstorage有容量限制，为了防止数据溢出，所以不将userImg数据放入session中
-				// 		user.userImg = '';
-				// 		this.$setSessionStorage('user', user);
-				// 		this.$router.go(-1);
-				// 	}
-				// }).catch(error => {
-				// 	console.error(error);
-				// });
+				this.$axios.post('SellerController/getSellerByIdByPass', this.$qs.stringify({
+					sellerId: this.sellerId,
+					password: this.password
+				})).then(response => {
+					let user = response.data.data;
+					if (user == null) {
+						alert('用户名或密码不正确！');
+					} else {
+						// sessionstorage有容量限制，为了防止数据溢出，所以不将userImg数据放入session中
+						user.userImg = '';
+						this.$setSessionStorage('seller', this.seller);
+						this.$router.go(-1);
+					}
+				}).catch(error => {
+					console.error(error);
+				});
 			},
 			register() {
 				this.$router.push({

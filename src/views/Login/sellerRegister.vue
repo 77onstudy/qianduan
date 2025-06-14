@@ -9,10 +9,18 @@
 		<div class="form-box">
 			<li>
 				<div class="title">
-					手机号码：
+					商家名称：
 				</div>
 				<div class="content">
-					<input type="text" @blur="checkUserId" v-model="user.userId" placeholder="手机号码">
+					<input type="text" @blur="checkSellerId" v-model="seller.sellerId" placeholder="名字">
+				</div>
+			</li>
+			<li>
+				<div class="title">
+					店名：
+				</div>
+				<div class="content">
+					<input type="text"  v-model="seller.businessName" placeholder="请输入店名">
 				</div>
 			</li>
 			<li>
@@ -20,7 +28,7 @@
 					密码：
 				</div>
 				<div class="content">
-					<input type="password" v-model="user.password" placeholder="密码">
+					<input type="password" v-model="seller.password" placeholder="密码">
 				</div>
 			</li>
 			<li>
@@ -29,23 +37,6 @@
 				</div>
 				<div class="content">
 					<input type="password" v-model="confirmPassword" placeholder="确认密码">
-				</div>
-			</li>
-			<li>
-				<div class="title">
-					商家名称：
-				</div>
-				<div class="content">
-					<input type="text" v-model="user.userName" placeholder="用户名称">
-				</div>
-			</li>
-			<li>
-				<div class="title">
-					性别：
-				</div>
-				<div class="content" style="font-size: 3vw;">
-					<input type="radio" v-model="user.userSex" value="1" style="width:6vw;height:3.2vw;">男
-					<input type="radio" v-model="user.userSex" value="0" style="width:6vw;height:3.2vw;">女
 				</div>
 			</li>
 		</div>
@@ -74,57 +65,52 @@
 				},
 				seller:{
 					sellerId:"777",
-					businessId: 777,
+					businessId: null,
 					password:"777",
 					businessName:"777",
-					sellerSex:1,
-					delTag:"",
 					
-
 				},
 				confirmPassword: ''
 			}
 		},
 		methods: {
-			checkUserId() {
-				this.$axios.post('UserController/getUserById', this.$qs.stringify({
-					userId: this.user.userId,
+			checkSellerId() {
+				this.$axios.post('SellerController/getSellerById', this.$qs.stringify({
+					sellerId: this.seller.sellerId,
 				})).then(response => {
-					if (response.data == 1) {
-						this.user.userId = '';
-						alert('此手机号码已存在！')
+					if (!response.data.code) {
+						this.seller.sellerId = '';
+						alert(response.data.massage);
 					}
 				}).catch(error => {
 					console.error(error);
 				});
 			},
 			register() {
-				if (this.user.userId == '') {
-					alert('手机号码不能为空！');
+				if (this.seller.sellerId == '') {
+					alert('商家名不能为空！');
 					return;
 				}
-				if (this.user.password == '') {
+				if (this.seller.businessName == '') {
+					alert('店铺名不能为空！');
+					return;
+				}
+				if (this.seller.password == '') {
 					alert('密码不能为空！');
 					return;
 				}
-				if (this.user.password != this.confirmPassword) {
+				if (this.seller.password != this.confirmPassword) {
 					alert('两次输入的密码不一致！');
 					return;
 				}
-				if (this.user.userName == '') {
-					alert('用户名不能为空！');
-					return;
-				}
-
 				// 注册请求
-				this.$axios.post('UserController/saveUser', this.$qs.stringify(
-					this.user
+				this.$axios.post('SellerController/saveSeller', this.$qs.stringify(
+					this.seller
 				)).then(response => {
-					if (response.data > 0) {
-						alert('注册成功！');
+					if (!response.data.code) {
 						this.$router.go(-1);
 					} else {
-						alert('注册失败！');
+						alert(response.data.massage);
 					}
 				}).catch(error => {
 					console.error(error);

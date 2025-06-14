@@ -20,7 +20,7 @@ import {
 const app = createApp(App)
 
 // 配置 axios
-axios.defaults.baseURL = 'http://localhost:8080/'
+axios.defaults.baseURL = 'http://localhost:8081/'
 
 // 添加全局属性 (Vue 3 方式)
 app.config.globalProperties.$axios = axios

@@ -71,7 +71,9 @@
 					return;
 				}
 				this.$setSessionStorage('user', this.user);
-				this.$router.go(-1);
+				this.$router.push({
+					path: '/'
+				});
 				// 登录请求
 				// this.$axios.post('UserController/getUserByIdByPass', this.$qs.stringify({
 				// 	userId: this.userId,
