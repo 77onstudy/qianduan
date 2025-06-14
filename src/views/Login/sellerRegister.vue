@@ -104,8 +104,13 @@
 					return;
 				}
 				// 注册请求
-				this.$axios.post('SellerController/saveSeller', this.$qs.stringify(
-					this.seller
+				this.$axios.post('SellerController/saveSeller', this.$qs.stringify({
+					sellerId : this.seller.sellerId,
+					businessName :this.seller.businessName,
+					password:this.seller.password
+				}
+
+					
 				)).then(response => {
 					if (!response.data.code) {
 						this.$router.go(-1);
