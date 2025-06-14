@@ -27,6 +27,11 @@ const routes = [
     component: () => import('../views/Login/userLogin.vue')
   },
   {
+    path: '/user',
+    name: 'UserPage',
+    component: () => import('../views/User.vue')  // 👈 新增用户中心页面
+  },
+  {
     path: '/sellerLogin',
     name: 'sellerLogin',
     component: () => import('../views/Login/sellerLogin.vue')
