@@ -13,7 +13,7 @@
 			<p>&#165;{{orders.orderTotal}}</p>
 		</div>
 
-		<ul class="order-detailet" v-show="isShowDetailet">
+		<div class="order-detailet" v-show="isShowDetailet">
 			<li v-for="item in orders.list" :key="item.food.foodId || index">
 				<p>{{item.food.foodName}} x {{item.quantity}}</p>
 				<p>&#165;{{item.food.foodPrice*item.quantity}}</p>
@@ -22,11 +22,11 @@
 				<p>配送费</p>
 				<p>&#165;{{orders.business.deliveryPrice}}</p>
 			</li>
-		</ul>
+		</div>
 
 		<div class="payment-section">
 			<h3>支付方式:</h3>
-			<ul class="payment-type">
+			<div class="payment-type">
 				<li @click="selectPayment('alipay')">
 					<img src="../assets/alipay.png" alt="支付宝">
 					<i class="fa fa-check-circle" v-show="paymentType === 'alipay'"></i>
@@ -35,7 +35,7 @@
 					<img src="../assets/wechat.png" alt="微信支付">
 					<i class="fa fa-check-circle" v-show="paymentType === 'wechat'"></i>
 				</li>
-			</ul>
+			</div>
 		</div>
 
 		<div class="payment-button">

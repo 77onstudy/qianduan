@@ -15,7 +15,7 @@
 
 		<h3>{{business.businessName}}</h3>
 
-		<ul class="order-detailed">
+		<div class="order-detailed">
 			<li v-for="item in cartArr" :key="item.food.foodId" >
 				<div class="order-detailed-left">
 					<img v-if="item.food.foodImg" 
@@ -26,7 +26,7 @@
 				</div>
 				<p>&#165;{{item.food.foodPrice*item.quantity}}</p>
 			</li>
-		</ul>
+		</div>
 
 		<div class="order-deliveryfee">
 			<p>配送费</p>

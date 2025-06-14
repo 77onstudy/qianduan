@@ -20,7 +20,7 @@ import {
 const app = createApp(App)
 
 // 配置 axios
-axios.defaults.baseURL = 'http://localhost:8081/'
+axios.defaults.baseURL = 'http://localhost:8080/'
 
 // 添加全局属性 (Vue 3 方式)
 app.config.globalProperties.$axios = axios
@@ -36,6 +36,7 @@ app.config.globalProperties.$removeLocalStorage = removeLocalStorage
 // 路由守卫
 router.beforeEach((to, from, next) => {
   const user = sessionStorage.getItem('user')
+  const seller =sessionStorage.getItem('seller')
   if (!(
     to.path === '/' || 
     to.path === '/index' || 
@@ -46,7 +47,7 @@ router.beforeEach((to, from, next) => {
     to.path === '/sellerLogin'||
     to.path === '/sellerRegister'
   )) {
-    if (user == null) {
+    if (user == null&&seller==null) {
       router.push('/login')
       
     }

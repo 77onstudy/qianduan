@@ -4,7 +4,7 @@
 			<p>商家列表</p>
 		</header>
 
-		<ul class="business">
+		<div class="business">
 			<li v-for="item in businessArr" :key="item.businessId"  @click="toBusinessInfo(item.businessId)">
 				<div class="business-img">
 					<img v-if="item.businessImg" :src="item.businessImg">
@@ -18,7 +18,7 @@
 					<p>{{item.businessExplain}}</p>
 				</div>
 			</li>
-		</ul>
+		</div>
 
 		<NavFooter></NavFooter>
 	</div>

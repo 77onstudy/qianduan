@@ -7,7 +7,7 @@
 
 		<!-- 订单列表部分 -->
 		<h3>未支付订单信息：</h3>
-		<ul class="order">
+		<div class="order">
 			<template v-for="item in orderArr" :key="item.orderId">
 			<li v-if="item.orderState==0">
 				<div class="order-info">
@@ -32,10 +32,10 @@
 				</ul>
 			</li>
 		</template>
-		</ul>
+		</div>
 
 		<h3>已支付订单信息：</h3>
-		<ul class="order">
+		<div class="order">
 			<template v-for="item in orderArr" :key="item.food.foodId">
 			<li  v-if="item.orderState==1">
 				<div class="order-info">
@@ -59,7 +59,7 @@
 				</ul>
 			</li>
 		</template>
-		</ul>
+		</div>
 
 		<!-- 底部菜单部分 -->
 		<NavFooter></NavFooter>

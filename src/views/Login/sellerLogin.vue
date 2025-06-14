@@ -55,7 +55,7 @@
 					businessId: 777,
 					password:"777",
 					businessName:"777",
-					sellerSex:1,
+					
 					
 					
 
@@ -74,22 +74,28 @@
 				}
 				
 				// 登录请求
-				this.$axios.post('SellerController/getSellerByIdByPass', this.$qs.stringify({
-					sellerId: this.sellerId,
-					password: this.password
-				})).then(response => {
-					let user = response.data.data;
-					if (user == null) {
-						alert('用户名或密码不正确！');
-					} else {
-						// sessionstorage有容量限制，为了防止数据溢出，所以不将userImg数据放入session中
-						user.userImg = '';
-						this.$setSessionStorage('seller', this.seller);
-						this.$router.go(-1);
-					}
-				}).catch(error => {
-					console.error(error);
-				});
+				this.$setSessionStorage('seller', this.seller);
+				this.$router.push({
+							path:'/sellerPage'
+						})
+				// this.$axios.post('SellerController/getSellerByIdByPass', this.$qs.stringify({
+				// 	sellerId: this.sellerId,
+				// 	password: this.password
+				// })).then(response => {
+				// 	let seller = response.data.data;
+				// 	if (seller == null) {
+				// 		alert('用户名或密码不正确！');
+				// 	} else {
+				// 		// sessionstorage有容量限制，为了防止数据溢出，所以不将userImg数据放入session中
+				// 		user.userImg = '';
+				// 		this.$setSessionStorage('seller', this.seller);
+				// 		this.$router.push({
+				// 			path:'/seller'
+				// 		})
+				// 	}
+				// }).catch(error => {
+				// 	console.error(error);
+				// });
 			},
 			register() {
 				this.$router.push({

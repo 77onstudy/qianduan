@@ -70,6 +70,11 @@ const routes = [
     path: '/sellerRegister',
     name: 'sellerRegister',
     component: () => import('../views/Login/sellerRegister.vue')
+  },
+  {
+    path: '/sellerPage',
+    name: 'sellerPage',
+    component: () => import('../views/SellerPage.vue')
   }
 ]
 

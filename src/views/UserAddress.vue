@@ -6,7 +6,7 @@
 		</header>
 
 		<!-- 地址列表部分 -->
-		<ul class="addresslist">
+		<div class="addresslist">
 			<li v-for="item in deliveryAddressArr" :key="item.daId">
 				<div class="addresslist-left" @click="setDeliveryAddress(item)">
 					<h3>{{item.contactName}}{{formatSex(item.contactSex)}} {{item.contactTel}}</h3>
@@ -17,7 +17,7 @@
 					<i class="fa fa-remove" @click="removeUserAddress(item.daId)"></i>
 				</div>
 			</li>
-		</ul>
+		</div>
 
 		<!-- 新增地址部分 -->
 		<div class="addbtn" @click="toAddUserAddress">
