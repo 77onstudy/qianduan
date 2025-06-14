@@ -2,17 +2,17 @@
 	<div class="wrapper">
 		<!-- header部分 -->
 		<header>
-			<p>用户登陆</p>
+			<p>用户注册</p>
 		</header>
 
 		<!-- 表单部分 -->
-		<ul class="form-box">
+		<div class="form-box">
 			<li>
 				<div class="title">
-					用户ID：
+					手机号码：
 				</div>
 				<div class="content">
-					<input type="text" v-model="userId" placeholder="用户ID">
+					<input type="text" @blur="checkUserId" v-model="user.userId" placeholder="手机号码">
 				</div>
 			</li>
 			<li>
@@ -20,17 +20,38 @@
 					密码：
 				</div>
 				<div class="content">
-					<input type="password" v-model="password" placeholder="密码">
+					<input type="password" v-model="user.password" placeholder="密码">
 				</div>
 			</li>
-		</ul>
-
-		<div class="button-login">
-			<button @click="login">登陆</button>
+			<li>
+				<div class="title">
+					确认密码：
+				</div>
+				<div class="content">
+					<input type="password" v-model="confirmPassword" placeholder="确认密码">
+				</div>
+			</li>
+			<li>
+				<div class="title">
+					用户名称：
+				</div>
+				<div class="content">
+					<input type="text" v-model="user.userName" placeholder="用户名称">
+				</div>
+			</li>
+			<li>
+				<div class="title">
+					性别：
+				</div>
+				<div class="content" style="font-size: 3vw;">
+					<input type="radio" v-model="user.userSex" value="1" style="width:6vw;height:3.2vw;">男
+					<input type="radio" v-model="user.userSex" value="0" style="width:6vw;height:3.2vw;">女
+				</div>
+			</li>
 		</div>
 
-		<div class="button-register">
-			<button @click="register">去注册</button>
+		<div class="button-login">
+			<button @click="register">注册</button>
 		</div>
 
 		<!-- 底部菜单部分 -->
@@ -39,57 +60,64 @@
 </template>
 
 <script>
-	import NavFooter from '../components/NavFooter.vue';
+	import NavFooter from '@/components/NavFooter.vue';
 
 	export default {
-		name: 'toLogin',
+		name: 'NavRegister',
 		data() {
 			return {
-				userId: '',
-				password: '',
-				user:{userId: "777",
-					password:"777",
-					userName:"777",
-					userSex:1,
-					userImg:"",
-					delTag:1,
-
+				user: {
+					userId: '',
+					password: '',
+					userName: '',
+					userSex: 1
 				},
+				confirmPassword: ''
 			}
 		},
 		methods: {
-			login() {
-				if (this.userId == '') {
-					alert('用户ID不能为空！');
+			checkUserId() {
+				this.$axios.post('UserController/getUserById', this.$qs.stringify({
+					userId: this.user.userId,
+				})).then(response => {
+					if (response.data == 1) {
+						this.user.userId = '';
+						alert('此手机号码已存在！')
+					}
+				}).catch(error => {
+					console.error(error);
+				});
+			},
+			register() {
+				if (this.user.userId == '') {
+					alert('手机号码不能为空！');
 					return;
 				}
-				if (this.password == '') {
+				if (this.user.password == '') {
 					alert('密码不能为空！');
 					return;
 				}
-				this.$setSessionStorage('user', this.user);
-				this.$router.go(-1);
-				// 登录请求
-				// this.$axios.post('UserController/getUserByIdByPass', this.$qs.stringify({
-				// 	userId: this.userId,
-				// 	password: this.password
-				// })).then(response => {
-				// 	let user = response.data;
-				// 	if (user == null) {
-				// 		alert('用户名或密码不正确！');
-				// 	} else {
-				// 		// sessionstorage有容量限制，为了防止数据溢出，所以不将userImg数据放入session中
-				// 		user.userImg = '';
-				// 		this.$setSessionStorage('user', user);
-				// 		this.$router.go(-1);
-				// 	}
-				// }).catch(error => {
-				// 	console.error(error);
-				// });
-			},
-			register() {
-				this.$router.push({
-					path: '/register'
+				if (this.user.password != this.confirmPassword) {
+					alert('两次输入的密码不一致！');
+					return;
+				}
+				if (this.user.userName == '') {
+					alert('用户名不能为空！');
+					return;
+				}
+
+				// 注册请求
+				this.$axios.post('UserController/saveUser', this.$qs.stringify(
+					this.user
+				)).then(response => {
+					if (response.data > 0) {
+						alert('注册成功！');
+						this.$router.go(-1);
+					} else {
+						alert('注册失败！');
+					}
+				}).catch(error => {
+					console.error(error);
 				});
 			}
 		},

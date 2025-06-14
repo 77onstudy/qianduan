@@ -1,4 +1,4 @@
-<template>
+<template class="wrapper">
 	<div class="wrapper">
 		<!-- header部分 -->
 		<header>
@@ -22,7 +22,7 @@
 			</div>
 		</div>
 		<!-- 点餐分类部分 -->
-		<ul class="foodtype">
+		<div class="foodtype">
 			<li @click="toBusinessList(1)">
 				<img src="../assets/dcfl01.png">
 				<p>美食</p>
@@ -63,7 +63,7 @@
 				<img src="../assets/dcfl10.png">
 				<p>炸鸡炸串</p>
 			</li>
-		</ul>
+		</div>
 		<!-- 横幅广告部分（注意：此处有背景图片） -->
 		<div class="banner">
 			<h3>品质套餐</h3>
@@ -88,14 +88,14 @@
 			<div class="recommend-line"></div>
 		</div>
 		<!-- 推荐方式部分 -->
-		<ul class="recommendtype">
+		<div class="recommendtype">
 			<li>综合排序<i class="fa fa-caret-down"></i></li>
 			<li>距离最近</li>
 			<li>销量最高</li>
 			<li>筛选<i class="fa fa-filter"></i></li>
-		</ul>
+		</div>
 		<!-- 推荐商家列表部分 -->
-		<ul class="business">
+		<div class="business">
 			<li>
 				<img src="../assets/sj01.png">
 				<div class="business-info">
@@ -321,7 +321,7 @@
 					</div>
 				</div>
 			</li>
-		</ul>
+		</div>
 		<!-- 底部菜单部分 -->
 		<NavFooter></NavFooter>
 	</div>
@@ -377,6 +377,8 @@
 	.wrapper {
 		width: 100%;
 		height: 100%;
+		display: flex;
+		flex-direction: column;
 	}
 
 	/****************** header ******************/

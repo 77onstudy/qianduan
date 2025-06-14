@@ -2,11 +2,11 @@
 	<div class="wrapper">
 		<!-- header部分 -->
 		<header>
-			<p>用户注册</p>
+			<p>商家注册</p>
 		</header>
 
 		<!-- 表单部分 -->
-		<ul class="form-box">
+		<div class="form-box">
 			<li>
 				<div class="title">
 					手机号码：
@@ -33,7 +33,7 @@
 			</li>
 			<li>
 				<div class="title">
-					用户名称：
+					商家名称：
 				</div>
 				<div class="content">
 					<input type="text" v-model="user.userName" placeholder="用户名称">
@@ -48,7 +48,7 @@
 					<input type="radio" v-model="user.userSex" value="0" style="width:6vw;height:3.2vw;">女
 				</div>
 			</li>
-		</ul>
+		</div>
 
 		<div class="button-login">
 			<button @click="register">注册</button>
@@ -60,10 +60,10 @@
 </template>
 
 <script>
-	import NavFooter from '../components/NavFooter.vue';
+	import NavFooter from '@/components/NavFooter.vue';
 
 	export default {
-		name: 'NavRegister',
+		name: 'sellerRegister',
 		data() {
 			return {
 				user: {
@@ -71,6 +71,16 @@
 					password: '',
 					userName: '',
 					userSex: 1
+				},
+				seller:{
+					sellerId:"777",
+					businessId: 777,
+					password:"777",
+					businessName:"777",
+					sellerSex:1,
+					delTag:"",
+					
+
 				},
 				confirmPassword: ''
 			}

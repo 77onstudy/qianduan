@@ -42,7 +42,9 @@ router.beforeEach((to, from, next) => {
     to.path === '/businessList' || 
     to.path === '/businessInfo' || 
     to.path === '/login' || 
-    to.path === '/register'
+    to.path === '/register'||
+    to.path === '/sellerLogin'||
+    to.path === '/sellerRegister'
   )) {
     if (user == null) {
       router.push('/login')

@@ -1,5 +1,5 @@
 <template>
-	<ul class="footer">
+	<div class="footer">
 		<li @click="toIndex">
 			<i class="fa fa-home"></i>
 			<p>首页</p>
@@ -16,7 +16,7 @@
 			<i class="fa fa-user-o"></i>
 			<p>我的</p>
 		</li>
-	</ul>
+	</div>
 </template>
 
 <script>
