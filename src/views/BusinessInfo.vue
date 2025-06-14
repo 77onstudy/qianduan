@@ -109,8 +109,9 @@
 			totalPrice() {
 				let total = 0;
 				for (let item of this.foodArr) {
-					total += item.foodPrice * item.quantity;
+					total += Math.floor(item.foodPrice * item.quantity*100);
 				}
+				total=total/100;
 				return total;
 			},
 			totalQuantity() {

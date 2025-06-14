@@ -81,9 +81,10 @@
 			totalPrice() {
 				let totalPrice = 0;
 				for (let cartItem of this.cartArr) {
-					totalPrice += cartItem.food.foodPrice * cartItem.quantity;
+					totalPrice += Math.floor(cartItem.food.foodPrice * cartItem.quantity*100);
 				}
-				totalPrice += this.business.deliveryPrice;
+				totalPrice += Math.floor(this.business.deliveryPrice*100);
+				totalPrice =totalPrice/100;
 				return totalPrice;
 			}
 		},
