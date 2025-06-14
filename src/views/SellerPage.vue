@@ -9,16 +9,7 @@ export default {
     name: "sellerPage",  
     data() {
         return {
-            seller:{
-					sellerId:"777",
-					businessId: 777,
-					password:"777",
-					businessName:"777",
-					
-					
-					
-
-				},
+            businessId: null,
         }
     },
     methods: {
@@ -28,7 +19,7 @@ export default {
         
     },
     created(){
-        
+        this.businessId= this.$route.query.businessId;
     }
 }
 </script>
