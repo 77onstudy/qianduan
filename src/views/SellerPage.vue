@@ -109,8 +109,8 @@
                         })
                     )
                     .then(response => {
-                        if (response.data && response.data.code === 0 && response.data.data) {
-                        Object.assign(this.business, response.data.data); 
+                        if (response.data) {
+                        Object.assign(this.business, response.data); 
                         } else {
                         console.warn('获取数据失败，接口返回不符合预期', response.data);
                         }

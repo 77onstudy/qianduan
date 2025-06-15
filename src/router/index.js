@@ -91,6 +91,14 @@ const routes = [
     name:'goodsManage',
     component:()=>import('../views/goodsManage.vue')
   },
+  {
+    path: '/addFood',
+    component: () => import('@/views/addFood.vue')
+  },
+  {
+    path: '/editFood',
+    component: () => import('@/views/editFood.vue')
+  },
 ]
 
 const router = createRouter({
