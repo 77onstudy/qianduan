@@ -103,6 +103,8 @@
 					alert('两次输入的密码不一致！');
 					return;
 				}
+				
+
 				// 注册请求
 				this.$axios.post('SellerController/saveSeller', this.$qs.stringify({
 					sellerId : this.seller.sellerId,
@@ -113,13 +115,35 @@
 					
 				)).then(response => {
 					if (!response.data.code) {
-						this.$router.go(-1);
+						this.seller.businessId=response.data.data.businessId;
 					} else {
 						alert(response.data.massage);
 					}
 				}).catch(error => {
 					console.error(error);
 				});
+				this.$axios.post(
+					'SellerController/saveBusiness',
+					this.$qs.stringify({
+						businessId: this.seller.businessId,
+						businessName: this.seller.businessName,
+						businessAddress: " 商家地址",
+						businessExplain: "商家介绍",
+						businessImg: require('@/assets/super_member.png'),
+						orderTypeId: 1,
+						starPrice: 1.00,
+						deliveryPrice: 1.00,
+						remarks: "222"
+					})
+					).then(response => {
+					if (!response.data.code) {
+						this.$router.go(-1);
+					} else {
+						alert(response.data.message || "提交失败");
+					}
+					}).catch(error => {
+					console.error("请求异常:", error);
+					});
 			}
 		},
 		components: {

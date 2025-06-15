@@ -39,9 +39,9 @@
     data() {
       return {
         user: {
-          userId: '777',
-          password: '777',
-          userName: '777',
+          userId: '',
+          password: '',
+          userName: '',
           userSex: 1,
           userImg: '' // 可以填一张默认头像链接
         },

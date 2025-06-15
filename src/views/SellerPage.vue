@@ -126,7 +126,7 @@
             }
 
             this.$axios.post(
-                '/BusinessController/getBusinessById',
+                '/BusinessController/updateBusiness',
                 this.$qs.stringify(this.business)
             )
             .then(res => {
