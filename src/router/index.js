@@ -80,6 +80,11 @@ const routes = [
     path: '/sellerPage',
     name: 'sellerPage',
     component: () => import('../views/SellerPage.vue')
+  },
+  {
+    path: '/DiscoverPage',
+    name: 'DiscoverPage',
+    component: () => import('../views/DiscoverPage.vue')
   }
 ]
 
