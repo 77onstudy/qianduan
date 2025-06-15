@@ -60,7 +60,7 @@
 <script>
 import NavFooter from '@/components/NavFooter.vue';
 import defaultAvatar from '@/assets/userImg/yhtx07.png';
-import axios from 'axios';
+//import axios from 'axios';
 
 
 export default {
@@ -80,39 +80,42 @@ export default {
     isEditable: false
   };
 },
-  methods: {
-    togglePassword() {
-      this.showPassword = !this.showPassword;
-    },
-    enableEditing() {
-      this.isEditable = true;
-    },
-    save() {
-      const payload = {
-        userId: this.user.userId,
-        userName: this.user.userName,
-        password: this.user.password,
-        userSex: this.user.userSex,
-        userImg: this.user.userImg || this.defaultAvatar
-      };
-      axios.post('/UserController/updateUser', null, {
-        params: payload
-      })
+methods: {
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  },
+  enableEditing() {
+    this.isEditable = true;
+  },
+  logout() {
+    this.$router.push('/login');
+  },
+  save() {
+    const updatedUser = {
+      userId: this.user.userId,
+      userName: this.user.userName,
+      password: this.user.password,
+      userSex: this.user.userSex,
+      userImg: this.user.userImg || this.defaultAvatar
+    };
+
+    this.$axios.post('/UserController/updateUser', this.$qs.stringify(updatedUser))
       .then(response => {
         if (response.data.code === 200) {
+          this.$setSessionStorage('user', response.data.data);
           this.user = response.data.data;
           alert('保存成功！');
           this.isEditable = false;
         } else {
-          alert('保存失败：' + response.data.msg);
+          alert('保存失败：' + response.data.message);
         }
       })
       .catch(error => {
         console.error('请求失败:', error);
         alert('请求失败');
       });
-    }
   }
+}
 };
 </script>
 
