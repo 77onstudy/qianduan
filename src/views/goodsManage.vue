@@ -74,7 +74,7 @@ export default {
       this.$router.push({ path: '/addFood', query: { businessId: this.businessId } });
     },
     goToEdit(foodId) {
-      this.$router.push({ path: '/editFood', query: { foodId, businessId: this.businessId } });
+      this.$router.push({ path: '/editFood', query: { foodId:foodId, businessId: this.businessId } });
     }
   }
 }

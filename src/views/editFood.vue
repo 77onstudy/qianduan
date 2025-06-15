@@ -43,6 +43,7 @@
   export default {
     data() {
       return {
+        foodId:null,
         businessId: null,
         form: {
           foodId: null,
@@ -57,6 +58,7 @@
     created() {
       const { foodId, businessId } = this.$route.query;
       this.businessId = businessId;
+      this.foodId=foodId;
       this.$axios.post('/FoodController/getFoodById', this.$qs.stringify({ foodId })).then(res => {
         if (res.data.code === 0) {
           this.form = res.data.data;
@@ -68,8 +70,10 @@
     methods: {
       submitForm() {
         const payload = this.$qs.stringify({
+          foodId:this.foodId,
           ...this.form,
           businessId: this.businessId
+          
         });
         this.$axios.post('/FoodController/updateFood', payload).then(res => {
           if (res.data.code === 0) {
