@@ -92,7 +92,7 @@
 				// 		this.$setSessionStorage('seller', this.seller);
 				// 		this.$router.push({
 				// 			path:'/sellerPage',
-				//			query:{businessId :seller.businessId}
+				//			query:{businessId :this.seller.businessId}
 				// 		})
 				// 	}
 				// }).catch(error => {
