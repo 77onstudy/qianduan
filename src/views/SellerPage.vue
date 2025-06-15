@@ -53,8 +53,7 @@
   </template>
   
   <script>
-  import axios from 'axios';
-  
+
   export default {
     name: "SellerPage",
     data() {
@@ -96,38 +95,54 @@
             }
             },
 
-      async fetchBusinessInfo() {
-        const res = await axios.post('/BusinessController/getBusinessById', {
-          businessId: this.business.businessId
-        });
-        this.business = res.data;
-      },
-      async submitForm() {
-        const delivery = this.business.deliveryPrice;
-        const pricePattern = /^\d+(\.\d{1,2})?$/;
+            fetchBusinessInfo() {
+            this.$axios.post(
+                'BusinessController/getBusinessById',
+                this.$qs.stringify({
+                businessId: this.business.businessId
+                })
+            )
+            .then(response => {
+                this.business = response.data;
+            })
+            .catch(error => {
+                console.error('获取商家信息失败：', error);
+            });
+            },
 
-        if (!pricePattern.test(delivery)) {
-            alert("配送费格式不正确，请输入最多两位小数的非负数字，例如 12.50");
-            return;
-        }
-        const star = this.business.starPrice;
-        if (!pricePattern.test(star)) {
-            alert("起送费格式不正确，请输入最多两位小数的非负数字，例如 8.00");
-            return;
-        }
-        try {
-            const res = await axios.post('/BusinessController/getBusinessById', this.business);
-            if (res.data.code === 0) {
-            alert("提交成功！");
-            } else {
-            console.error("提交失败:", res.data.message || res.data);
-            alert("提交失败：" + (res.data.message || "未知错误"));
+            submitForm() {
+            const delivery = this.business.deliveryPrice;
+            const pricePattern = /^\d+(\.\d{1,2})?$/;
+
+            if (!pricePattern.test(delivery)) {
+                alert("配送费格式不正确，请输入最多两位小数的非负数字，例如 12.50");
+                return;
             }
-        } catch (error) {
-            console.error("请求异常:", error);  
-            alert("提交异常：" + error.message);
-        }
-        },
+
+            const star = this.business.starPrice;
+            if (!pricePattern.test(star)) {
+                alert("起送费格式不正确，请输入最多两位小数的非负数字，例如 8.00");
+                return;
+            }
+
+            this.$axios.post(
+                '/BusinessController/getBusinessById',
+                this.$qs.stringify(this.business)
+            )
+            .then(res => {
+                if (res.data.code === 0) {
+                alert("提交成功！");
+                } else {
+                console.error("提交失败:", res.data.message || res.data);
+                alert("提交失败：" + (res.data.message || "未知错误"));
+                }
+            })
+            .catch(error => {
+                console.error("请求异常:", error);
+                alert("提交异常：" + error.message);
+            });
+            },
+
       goToGoodsManage() {
         this.$router.push({ path: '/goodsManage', query: { businessId: this.business.businessId } });
       }
