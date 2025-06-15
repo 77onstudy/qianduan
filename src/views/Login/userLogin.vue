@@ -70,29 +70,28 @@
 					alert('密码不能为空！');
 					return;
 				}
-				this.$setSessionStorage('user', this.user);
-				this.$router.push({
-					path: '/'
-				});
-				// 登录请求
-				// this.$axios.post('UserController/getUserByIdByPass', this.$qs.stringify({
-				// 	userId: this.userId,
-				// 	password: this.password
-				// })).then(response => {
-				// 	let user = response.data.data;
-				// 	if (user == null) {
-				// 		alert('用户名或密码不正确！');
-				// 	} else {
-				// 		// sessionstorage有容量限制，为了防止数据溢出，所以不将userImg数据放入session中
-				// 		user.userImg = '';
-				// 		this.$setSessionStorage('user', user);
-				// 		this.$router.push({
-				//	 	path: '/'
-				//		});
-				// 	}
-				// }).catch(error => {
-				// 	console.error(error);
+				// this.$setSessionStorage('user', this.user);
+				// this.$router.push({
+				// 	path: '/'
 				// });
+			this.$axios.post('UserController/getUserByIdByPass', this.$qs.stringify({
+			userId: this.userId,
+			password: this.password
+			})).then(response => {
+			let user = response.data.data;
+			if (user == null) {
+			alert('用户名或密码不正确！');
+			} else {
+			// sessionstorage有容量限制，为了防止数据溢出，所以不将userImg数据放入session中
+			user.userImg = '';
+			this.$setSessionStorage('user', user);
+			this.$router.push({
+			path: '/'
+			});
+			}
+			}).catch(error => {
+			console.error(error);
+			});
 			},
 			register() {
 				this.$router.push({

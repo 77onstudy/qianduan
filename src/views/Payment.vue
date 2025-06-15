@@ -58,7 +58,7 @@
 					business: {}
 				},
 				isShowDetailet: false,
-				paymentType: '' // 新增：当前选中的支付方式
+				paymentType: 'wechat' // 新增：当前选中的支付方式
 			}
 		},
 		created() {

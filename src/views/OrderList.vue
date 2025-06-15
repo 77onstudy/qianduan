@@ -36,7 +36,7 @@
 
 		<h3>已支付订单信息：</h3>
 		<div class="order">
-			<template v-for="item in orderArr" :key="item.food.foodId">
+			<template v-for="item in orderArr" :key="item.orderId">
 			<li  v-if="item.orderState==1">
 				<div class="order-info">
 					<p>
