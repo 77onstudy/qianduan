@@ -91,9 +91,10 @@ export default {
         userId: this.user.userId,
         userName: this.user.userName,
         password: this.user.password,
-        userSex: this.user.userSex
+        userSex: this.user.userSex,
+        userImg: this.user.userImg || this.defaultAvatar
       };
-      axios.post('http://UserController/updateUser', null, {
+      axios.post('/UserController/updateUser', null, {
         params: payload
       })
       .then(response => {
