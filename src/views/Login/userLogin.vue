@@ -86,7 +86,9 @@
 				// 		// sessionstorage有容量限制，为了防止数据溢出，所以不将userImg数据放入session中
 				// 		user.userImg = '';
 				// 		this.$setSessionStorage('user', user);
-				// 		this.$router.go(-1);
+				// 		this.$router.push({
+				//	 	path: '/'
+				//		});
 				// 	}
 				// }).catch(error => {
 				// 	console.error(error);

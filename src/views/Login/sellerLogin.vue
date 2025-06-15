@@ -76,7 +76,8 @@
 				// 登录请求
 				this.$setSessionStorage('seller', this.seller);
 				this.$router.push({
-							path:'/sellerPage'
+							path:'/sellerPage',
+							query:{businessId :this.seller.businessId}
 						})
 				// this.$axios.post('SellerController/getSellerByIdByPass', this.$qs.stringify({
 				// 	sellerId: this.sellerId,
@@ -87,11 +88,11 @@
 				// 		alert('用户名或密码不正确！');
 				// 	} else {
 				// 		// sessionstorage有容量限制，为了防止数据溢出，所以不将userImg数据放入session中
-				// 		user.userImg = '';
+				// 		seller.businessImg = '';
 				// 		this.$setSessionStorage('seller', this.seller);
 				// 		this.$router.push({
-				// 			path:'/seller'
-				//			query:{businessId :this.businessId}
+				// 			path:'/sellerPage',
+				//			query:{businessId :this.seller.businessId}
 				// 		})
 				// 	}
 				// }).catch(error => {

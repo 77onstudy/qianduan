@@ -148,7 +148,8 @@
       }
     },
     created() {
-      this.business.businessId = parseInt(this.$route.query.businessId);
+      this.business.businessId = this.$route.query.businessId;
+      console.log(this.business.businessId);
       this.fetchBusinessInfo();
     }
   }
