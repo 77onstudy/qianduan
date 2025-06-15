@@ -31,8 +31,8 @@
     <div class="field">
       <label>性别：</label>
       <div class="gender-options">
-        <label><input type="radio" v-model="user.userSex" value="1" :disabled="!isEditable" /> 男</label>
-        <label><input type="radio" v-model="user.userSex" value="2" :disabled="!isEditable" /> 女</label>
+        <label><input type="radio" v-model="user.userSex" :value="1" :disabled="!isEditable" /> 男</label>
+        <label><input type="radio" v-model="user.userSex" :value="0" :disabled="!isEditable" /> 女</label>
       </div>
     </div>
 
@@ -60,6 +60,7 @@
 <script>
 import NavFooter from '@/components/NavFooter.vue';
 import defaultAvatar from '@/assets/userImg/yhtx07.png';
+import axios from 'axios';
 
 export default {
   name: 'UserPage',
@@ -86,11 +87,28 @@ export default {
       this.isEditable = true;
     },
     save() {
-      alert('保存成功！');
-      this.isEditable = false;
-    },
-    logout() {
-      this.$router.push('/login');
+      const payload = {
+        userId: this.user.userId,
+        userName: this.user.userName,
+        password: this.user.password,
+        userSex: this.user.userSex
+      };
+      axios.post('http://UserController/updateUser', null, {
+        params: payload
+      })
+      .then(response => {
+        if (response.data.code === 200) {
+          this.user = response.data.data;
+          alert('保存成功！');
+          this.isEditable = false;
+        } else {
+          alert('保存失败：' + response.data.msg);
+        }
+      })
+      .catch(error => {
+        console.error('请求失败:', error);
+        alert('请求失败');
+      });
     }
   }
 };
@@ -235,4 +253,4 @@ h2 {
 .ghost:hover {
   background-color: #e0e0e0;
 }
-</style> 我改的对吗
+</style>
