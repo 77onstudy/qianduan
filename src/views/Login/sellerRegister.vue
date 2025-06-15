@@ -74,18 +74,18 @@
 			}
 		},
 		methods: {
-			checkSellerId() {
-				this.$axios.post('SellerController/getSellerById', this.$qs.stringify({
-					sellerId: this.seller.sellerId,
-				})).then(response => {
-					if (!response.data.code) {
-						this.seller.sellerId = '';
-						alert(response.data.massage);
-					}
-				}).catch(error => {
-					console.error(error);
-				});
-			},
+			// checkSellerId() {
+			// 	this.$axios.post('SellerController/getSellerById', this.$qs.stringify({
+			// 		sellerId: this.seller.sellerId,
+			// 	})).then(response => {
+			// 		if (!response.data.code) {
+			// 			this.seller.sellerId = '';
+			// 			alert(response.data.massage);
+			// 		}
+			// 	}).catch(error => {
+			// 		console.error(error);
+			// 	});
+			// },
 			register() {
 				if (this.seller.sellerId == '') {
 					alert('商家名不能为空！');
@@ -115,15 +115,9 @@
 					
 				)).then(response => {
 					if (!response.data.code) {
-						this.seller.businessId=response.data.data.businessId;
-					} else {
-						alert(response.data.massage);
-					}
-				}).catch(error => {
-					console.error(error);
-				});
-				this.$axios.post(
-					'SellerController/saveBusiness',
+						this.seller=response.data.data;
+						this.$axios.post(
+					'BusinessController/saveBusiness',
 					this.$qs.stringify({
 						businessId: this.seller.businessId,
 						businessName: this.seller.businessName,
@@ -144,6 +138,13 @@
 					}).catch(error => {
 					console.error("请求异常:", error);
 					});
+					} else {
+						alert(response.data.massage);
+					}
+				}).catch(error => {
+					console.error(error);
+				});
+				
 			}
 		},
 		components: {

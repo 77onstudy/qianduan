@@ -85,7 +85,12 @@ const routes = [
     path: '/DiscoverPage',
     name: 'DiscoverPage',
     component: () => import('../views/DiscoverPage.vue')
-  }
+  },
+  {
+    path: '/goodsManage',
+    name:'goodsManage',
+    component:()=>import('../views/goodsManage.vue')
+  },
 ]
 
 const router = createRouter({

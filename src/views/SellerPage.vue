@@ -1,11 +1,11 @@
 <template>
     <div class="seller-page">
-      <h2>商家信息管理</h2>
+      <h2>信息管理</h2>
       <form @submit.prevent="submitForm">
-        <div>
+        <!-- <div>
           <label>商家ID：</label>
           <input type="text" v-model="business.businessId" disabled />
-        </div>
+        </div> -->
         <div>
           <label>商家名称：</label>
           <input type="text" v-model="business.businessName" />
@@ -103,7 +103,7 @@
                 })
             )
             .then(response => {
-                this.business = response.data;
+                this.business = response.data.data;
             })
             .catch(error => {
                 console.error('获取商家信息失败：', error);
@@ -149,7 +149,6 @@
     },
     created() {
       this.business.businessId = this.$route.query.businessId;
-      console.log(this.business.businessId);
       this.fetchBusinessInfo();
     }
   }
