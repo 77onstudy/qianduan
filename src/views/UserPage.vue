@@ -101,7 +101,7 @@ methods: {
 
     this.$axios.post('/UserController/updateUser', this.$qs.stringify(updatedUser))
       .then(response => {
-        if (response.data.code === 200) {
+        if (response.data.code === 0) {
           this.$setSessionStorage('user', response.data.data);
           this.user = response.data.data;
           alert('保存成功！');
