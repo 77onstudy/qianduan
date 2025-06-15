@@ -1,11 +1,10 @@
 <template>
 	<div class="wrapper">
-		<header>
+		<header class="header">
 			<p>商家信息</p>
 		</header>
-
 		<div class="business-logo">
-			<img v-if="business.businessImg" :src="business.businessImg" :alt="business.businessName">
+			<img class="logo" v-if="business.businessImg" :src="business.businessImg" :alt="business.businessName">
 		</div>
 
 		<div class="business-info">
@@ -16,22 +15,27 @@
 
 		<div class="food">
 			<template v-for="(item,index) in foodArr" :key="item.foodId || index">
+				<div class="food1">
 				<div class="food-left">
 					<img v-if="item.foodImg" :src="item.foodImg" :alt="item.foodName">
-					<div class="food-left-info">
-						<h3>{{item.foodName}}</h3>
-						<p>{{item.foodExplain}}</p>
-						<p>&#165;{{item.foodPrice}}</p>
+					
+				</div>
+				<div class="food-left-info">
+					<div>{{item.foodName}}</div>
+					<div>{{item.foodExplain}}</div>
+					<div>&#165;{{item.foodPrice}}</div>
+					<div class="food-right">
+						<div>
+							<i class="fa fa-minus-circle" @click="minus(index)" v-show="item.quantity!=0"></i>
+						</div>
+						<div><span v-show="item.quantity!=0">{{item.quantity}}</span></div>
+						<div>
+							<i class="fa fa-plus-circle" @click="add(index)"></i>
+						</div>
 					</div>
 				</div>
-				<div class="food-right">
-					<div>
-						<i class="fa fa-minus-circle" @click="minus(index)" v-show="item.quantity!=0"></i>
-					</div>
-					<p><span v-show="item.quantity!=0">{{item.quantity}}</span></p>
-					<div>
-						<i class="fa fa-plus-circle" @click="add(index)"></i>
-					</div>
+				
+				
 				</div>
 			</template>
 			<!-- 添加无商品提示 -->
@@ -233,10 +237,13 @@
 	.wrapper {
 		width: 100%;
 		height: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 	}
 
 	/*********** header部分 ************/
-	.wrapper header {
+	.header {
 		width: 100%;
 		height: 12vw;
 		background-color: #0097FF;
@@ -254,109 +261,50 @@
 	}
 
 	/*********** 商家logo部分 ************/
-	.wrapper .business-logo {
+	.business-logo{
+		margin-top: 40px;
 		width: 100%;
-		height: 35vw;
-		/*使用上外边距避开header部分*/
-		margin-top: 12vw;
-
+		height: 40vm;
 		display: flex;
 		justify-content: center;
-		align-items: center;
 	}
-
-	.wrapper .business-logo img {
-		width: 40vw;
-		height: 30vw;
-		border-radius: 5px;
+	.business-logo .img{
+		width: 40vm;
+		height: 40vm;
 	}
-
-	/*********** 商家信息部分 ************/
-	.wrapper .business-info {
-		width: 100%;
-		height: 20vw;
+	.business-info{
+		display: flex;
+		justify-content: end;
+		flex-direction: column;
+		text-align: center;
+		display: inline;
+	}
+	.food{
+		display: flex;
+		flex-direction: column;		
+		
+	}
+	.food1{
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+		margin-bottom: 10px;
+		
+	}
+	.food-left-info{
+		display: inline;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		align-items: center;
-	}
-
-	.wrapper .business-info h1 {
-		font-size: 5vw;
-	}
-
-	.wrapper .business-info p {
-		font-size: 3vw;
-		color: #666;
-		margin-top: 1vw;
-	}
-
-	/****************** 食品列表部分 ******************/
-	.wrapper .food {
-		width: 100%;
-		/*使用下外边距避开NavFooter部分*/
-		margin-bottom: 14vw;
-	}
-
-	.wrapper .food li {
-		width: 100%;
-		box-sizing: border-box;
-		padding: 2.5vw;
-		user-select: none;
-		display: flex;
+		text-align: center;
 		justify-content: space-between;
-		align-items: center;
 	}
-
-	.wrapper .food li .food-left {
+	.food-right{
 		display: flex;
-		align-items: center;
+		flex-direction: row;
+		justify-content: space-around;	
+		
 	}
-
-	.wrapper .food li .food-left img {
-		width: 20vw;
-		height: 20vw;
-	}
-
-	.wrapper .food li .food-left .food-left-info {
-		margin-left: 3vw;
-	}
-
-	.wrapper .food li .food-left .food-left-info h3 {
-		font-size: 3.8vw;
-		color: #555;
-	}
-
-	.wrapper .food li .food-left .food-left-info p {
-		font-size: 3vw;
-		color: #888;
-		margin-top: 2vw;
-	}
-
-	.wrapper .food li .food-right {
-		width: 16vw;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.wrapper .food li .food-right .fa-minus-circle {
-		font-size: 5.5vw;
-		color: #999;
-		cursor: pointer;
-	}
-
-	.wrapper .food li .food-right p {
-		font-size: 3.6vw;
-		color: #333;
-	}
-
-	.wrapper .food li .food-right .fa-plus-circle {
-		font-size: 5.5vw;
-		color: #0097EF;
-		cursor: pointer;
-	}
-
 	/****************** 购物车部分 ******************/
 	.wrapper .cart {
 		width: 100%;

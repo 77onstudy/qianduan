@@ -4,9 +4,7 @@
     <h2>🍱 食品管理</h2>
 
     <!-- 添加按钮 -->
-    <div class="top-bar">
-      <button class="add" @click="goToAdd">➕ 添加新食品</button>
-    </div>
+
 
     <!-- 表格 -->
     <div class="table-card">
@@ -17,7 +15,6 @@
             <th>介绍</th>
             <th>图片</th>
             <th>价格</th>
-            <th>备注</th>
             <th>操作</th>
           </tr>
         </thead>
@@ -27,7 +24,6 @@
             <td>{{ food.foodExplain }}</td>
             <td><img :src="food.foodImg" alt="" /></td>
             <td>{{ food.foodPrice }}</td>
-            <td>{{ food.remarks }}</td>
             <td>
               <button class="edit" @click="goToEdit(food.foodId)">编辑</button>
               <button class="delete" @click="deleteFood(food.foodId)">删除</button>
@@ -35,6 +31,9 @@
           </tr>
         </tbody>
       </table>
+    </div>
+    <div class="top-bar">
+      <button class="add" @click="goToAdd">➕ 添加新食品</button>
     </div>
   </div>
 </template>
@@ -74,7 +73,7 @@ export default {
       this.$router.push({ path: '/addFood', query: { businessId: this.businessId } });
     },
     goToEdit(foodId) {
-      this.$router.push({ path: '/editFood', query: { foodId:foodId, businessId: this.businessId } });
+      this.$router.push({ path: '/editFood', query: { foodId, businessId: this.businessId } });
     }
   }
 }
@@ -84,20 +83,19 @@ export default {
 .goods-manage {
   max-width: 960px;
   margin: auto;
-  padding: 24px;
+  padding: 4px;
   font-family: 'Segoe UI', sans-serif;
 }
 
 h2 {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 14px;
   color: #333;
 }
 
 .top-bar {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 16px;
 }
 
 button.add {
@@ -108,22 +106,22 @@ button.add {
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
+  width: 100%;
 }
 
 .table-card {
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  padding: 24px;
 }
 
 button.edit {
   background-color: #17a2b8;
   color: white;
-  margin-right: 6px;
   border: none;
   padding: 6px 12px;
   border-radius: 6px;
+  white-space: nowrap;
 }
 
 button.delete {
@@ -132,6 +130,8 @@ button.delete {
   border: none;
   padding: 6px 12px;
   border-radius: 6px;
+  white-space: nowrap;
+  
 }
 
 table {
@@ -142,6 +142,8 @@ table {
 th {
   background-color: #f8f9fa;
   font-weight: bold;
+  width: 70px;
+  
 }
 
 th, td {

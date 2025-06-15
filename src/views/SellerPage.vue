@@ -1,6 +1,6 @@
 <template>
     <div class="seller-page">
-      <h2>信息管理</h2>
+      <h2>商家信息管理</h2>
       <form v-if="business" @submit.prevent="submitForm">
         <!-- <div>
           <label>商家ID：</label>
@@ -18,13 +18,7 @@
           <label>商家介绍：</label>
           <input type="text" v-model="business.businessExplain" />
         </div>
-        <div>
-            <label>商家图片：</label>
-        <input type="file" @change="handleImageUpload" accept="image/*" />
-        <div v-if="business.businessImg">
-            <img :src="business.businessImg" alt="预览" style="max-width: 200px; margin-top: 10px;" />
-        </div>
-        </div>
+        
         <div>
         <label>点餐分类：</label>
         <select v-model="business.orderTypeId">
@@ -46,8 +40,17 @@
           <label>备注：</label>
           <input type="text" v-model="business.remarks" />
         </div>
-        <button type="submit">提交</button>
-        <button type="button" @click="goToGoodsManage">管理商品</button>
+        <div>
+            <label>商家图片：</label>
+        <input type="file" @change="handleImageUpload" accept="image/*" />
+        <div v-if="business.businessImg">
+            <img :src="business.businessImg" alt="预览" style="max-width: 200px; margin-top: 10px;" />
+        </div>
+        </div>
+        <div class="button-group">
+        <button type="submit" class="submit">提交</button>
+        <button type="button" class="manage" @click="goToGoodsManage">管理商品</button>
+        </div>
       </form>
     </div>
   </template>
@@ -167,10 +170,90 @@
   
   <style scoped>
   .seller-page {
-    padding: 20px;
+    max-width: 720px;
+    margin: auto;
+    padding: 24px;
+    font-family: 'Segoe UI', sans-serif;
   }
-  .seller-page form > div {
-    margin-bottom: 10px;
+  
+  h2 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #2c3e50;
+  }
+  
+  form {
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  form > div {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #444;
+  }
+  
+  input,
+  select,
+  textarea {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: #409eff;
+    outline: none;
+  }
+  
+  img {
+    margin-top: 10px;
+    max-width: 200px;
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.2);
+  }
+  
+  .button-group {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  
+  button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  button.submit {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  button.manage {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  button:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
   }
   </style>
   
