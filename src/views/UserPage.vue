@@ -88,6 +88,7 @@ methods: {
     this.isEditable = true;
   },
   logout() {
+    this.$removeSessionStorage('user');
     this.$router.push('/login');
   },
   save() {
