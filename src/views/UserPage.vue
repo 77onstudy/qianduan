@@ -62,23 +62,24 @@ import NavFooter from '@/components/NavFooter.vue';
 import defaultAvatar from '@/assets/userImg/yhtx07.png';
 import axios from 'axios';
 
+
 export default {
   name: 'UserPage',
   components: { NavFooter },
   data() {
-    return {
-      defaultAvatar,
-      user: {
-        userId: '777',
-        password: '777',
-        userName: '777',
-        userSex: 1,
-        userImg: ''
-      },
-      showPassword: false,
-      isEditable: false
-    };
-  },
+  return {
+    defaultAvatar,
+    user: this.$getSessionStorage('user') || {
+      userId: '',
+      password: '',
+      userName: '',
+      userSex: 1,
+      userImg: ''
+    },
+    showPassword: false,
+    isEditable: false
+  };
+},
   methods: {
     togglePassword() {
       this.showPassword = !this.showPassword;
