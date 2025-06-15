@@ -4,9 +4,9 @@
 			<i class="fa fa-home"></i>
 			<p>首页</p>
 		</li>
-		<li>
+		<li @click="toHongbao">
 			<i class="fa fa-compass"></i>
-			<p>发现</p>
+			<p>爆红包</p>
 		</li>
 		<li @click="toOrderList">
 			<i class="fa fa-file-text-o"></i>
@@ -36,6 +36,10 @@
 			toUser() {
 				this.$router.push({ 
 					path: '/user' }) // 👈 跳转到用户页
+			},
+			toHongbao() {
+				this.$router.push({ 
+					path: '/DiscoverPage' }) // 👈 跳转到用户页
 			}
 		}
 	}
