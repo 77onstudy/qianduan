@@ -12,7 +12,7 @@
 			<i class="fa fa-file-text-o"></i>
 			<p>订单</p>
 		</li>
-		<li @click="toUser">
+		<li @click="toUserPage">
 			<i class="fa fa-user-o"></i>
 			<p>我的</p>
 		</li>
@@ -33,7 +33,7 @@
 					path: '/orderList'
 				});
 			},
-			toUser() {
+			toUserPage() {
 				this.$router.push({ 
 					path: '/user' }) // 👈 跳转到用户页
 			},
