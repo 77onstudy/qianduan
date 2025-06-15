@@ -71,15 +71,15 @@
             { id: 10, name: '炸鸡炸串' }
         ],
         business: {
-          businessId: 888,
-          businessName: '777',
-          businessAddress: '777',
-          businessExplain: '777',
-          businessImg: '777',
+          businessId: 0,
+          businessName: '',
+          businessAddress: '',
+          businessExplain: '',
+          businessImg: '',
           orderTypeId: 1,
           starPrice: 1.00,
           deliveryPrice: 1.00,
-          remarks: '77'
+          remarks: ''
         },
         seller:{
                 sellerId:"777",
@@ -120,6 +120,7 @@
                     });
             },
             submitForm() {
+                //console.log('当前 business 数据：', this.business);
             const delivery = this.business.deliveryPrice;
             const pricePattern = /^\d+(\.\d{1,2})?$/;
 
@@ -157,6 +158,7 @@
       }
     },
     mounted() {
+        
       this.business.businessId = this.$route.query.businessId;
       this.fetchBusinessInfo();
     }
