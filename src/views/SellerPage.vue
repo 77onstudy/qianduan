@@ -74,7 +74,7 @@
         if (idFromRoute) return idFromRoute;
   
         try {
-          const seller = JSON.parse(sessionStorage.getItem("seller"));
+          const seller = this.$getSessionStorage('seller');;
           return seller?.businessId || null;
         } catch {
           return null;
