@@ -5,7 +5,7 @@
 			<div class="icon-location-box">
 				<div class="icon-location"></div>
 			</div>
-			<div class="location-text">天津大学北洋园校区<i class="fa fa-caret-down"></i></div>
+			<div class="location-text">{{ locationText }}<i class="fa fa-caret-down"></i></div>
 		</header>
 		<!-- search部分 -->
 		<!--
@@ -328,11 +328,18 @@
 </template>
 
 <script>
+/* global BMap, BMAP_STATUS_SUCCESS */
 	import NavFooter from '../components/NavFooter.vue';
 
 	export default {
 		name: 'IndexPage',
+		data() {
+			return {
+				locationText: '定位中...'
+			};
+		},
 		mounted() {
+			this.getLocation(); // 加载时定位
 			document.onscroll = () => {
 				//获取滚动条位置
 				let s1 = document.documentElement.scrollTop;
@@ -367,7 +374,34 @@
 						orderTypeId: orderTypeId
 					}
 				});
+			},
+			getLocation() {
+				const _this = this;
+				const geolocation = new BMap.Geolocation();
+				geolocation.enableSDKLocation();
+				geolocation.getCurrentPosition(function (r) {
+					if (this.getStatus() === BMAP_STATUS_SUCCESS) {
+						const geoc = new BMap.Geocoder();
+						geoc.getLocation(r.point, function (rs) {
+							const addComp = rs.addressComponents;
+							const pois = rs.surroundingPois; // 获取周边 POI 信息
+							console.log("POI results:", pois);
+
+							// 查找“天津大学”关键词优先使用
+							const matchedPOI = pois.find(p => p.title.includes("天津大学"));
+							if (matchedPOI) {
+								_this.locationText = matchedPOI.title;  // 例如“天津大学北洋园校区”
+							} else {
+								_this.locationText = `${addComp.city}${addComp.district}${addComp.street}`;
+							}
+						});
+					} else {
+						console.log('定位失败：状态码 = ', this.getStatus());
+						_this.locationText = '定位失败';
+					}
+				});
 			}
+
 		}
 	}
 </script>
