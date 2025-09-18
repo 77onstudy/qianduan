@@ -64,41 +64,38 @@
 		},
 		methods: {
 			login() {
-				if (this.sellerId == '') {
-					alert('商家ID不能为空！');
-					return;
-				}
-				if (this.password == '') {
-					alert('密码不能为空！');
-					return;
-				}
-				
-				// 登录请求
-				this.$setSessionStorage('seller', this.seller);
-				this.$router.push({
-							path:'/sellerPage',
-							query:{businessId :this.seller.businessId}
-						})
-				// this.$axios.post('SellerController/getSellerByIdByPass', this.$qs.stringify({
-				// 	sellerId: this.sellerId,
-				// 	password: this.password
-				// })).then(response => {
-				// 	let seller = response.data.data;
-				// 	if (seller == null) {
-				// 		alert('用户名或密码不正确！');
-				// 	} else {
-				// 		// sessionstorage有容量限制，为了防止数据溢出，所以不将userImg数据放入session中
-				// 		seller.businessImg = '';
-				// 		this.$setSessionStorage('seller', this.seller);
-				// 		this.$router.push({
-				// 			path:'/sellerPage',
-				//			query:{businessId :seller.businessId}
-				// 		})
-				// 	}
-				// }).catch(error => {
-				// 	console.error(error);
-				// });
-			},
+                    if (this.sellerId === '') {
+                        alert('商家ID不能为空！');
+                        return;
+                    }
+                    if (this.password === '') {
+                        alert('密码不能为空！');
+                        return;
+                    }
+
+                    this.$axios.post('/api/auth', {
+                        username: this.sellerId,   // LoginDto.username
+                        password: this.password,   // LoginDto.password
+                        rememberMe: false          // LoginDto.rememberMe (布尔值)
+                        }).then(response => {
+                        const token = response.data.id_token || response.data.token;
+                        if (!token) {
+                            alert('登录失败：未返回token');
+                            return;
+                        }
+
+                        sessionStorage.setItem('token', token);
+
+                        const admin = { adminId: this.sellerId };
+                        this.$setSessionStorage('admin', admin);
+
+                        this.$router.push({ path: '/adminPage' });
+                        }).catch(error => {
+                        console.error(error);
+                        alert('商家名或密码错误！');
+                        });
+
+                    },
 			register() {
 				this.$router.push({
 					path: '/sellerRegister'
