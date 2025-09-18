@@ -73,26 +73,28 @@
                         return;
                     }
 
-                    this.$axios.post('/api/auth', this.$qs.stringify({
-                        username: this.sellerId,  
-                        password: this.password,
-                        rememberMe: false
-                    })).then(response => {
-                        const token = response.data.token || response.data.id_token;
+                    this.$axios.post('/api/auth', {
+                        username: this.sellerId,   // LoginDto.username
+                        password: this.password,   // LoginDto.password
+                        rememberMe: false          // LoginDto.rememberMe (布尔值)
+                        }).then(response => {
+                        const token = response.data.id_token || response.data.token;
                         if (!token) {
-                        alert('登录失败：未返回token');
-                        return;
+                            alert('登录失败：未返回token');
+                            return;
                         }
+
                         sessionStorage.setItem('token', token);
 
                         const admin = { adminId: this.sellerId };
                         this.$setSessionStorage('admin', admin);
 
-                        this.$router.push({ path: '/adminPage'});
-                    }).catch(error => {
+                        this.$router.push({ path: '/adminPage' });
+                        }).catch(error => {
                         console.error(error);
                         alert('管理员名或密码错误！');
-                    });
+                        });
+
                     },
 
 			register() {
