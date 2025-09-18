@@ -2,17 +2,17 @@
 	<div class="wrapper">
 		<!-- header部分 -->
 		<header>
-			<p>用户登陆</p>
+			<p>管理员登陆</p>
 		</header>
 
 		<!-- 表单部分 -->
 		<div class="form-box">
 			<li>
 				<div class="title">
-					用户ID：
+					管理员ID：
 				</div>
 				<div class="content">
-					<input type="text" v-model="userId" placeholder="用户ID">
+					<input type="text" v-model="sellerId" placeholder="管理员ID">
 				</div>
 			</li>
 			<li>
@@ -26,17 +26,14 @@
 		</div>
 
 		<div class="button-login">
-			<button @click="login">用户登陆</button>
+			<button @click="login">管理员登陆</button>
 		</div>
 
-		<div class="button-register">
-			<button @click="register">用户注册</button>
-		</div>
+		<!-- <div class="button-register">
+			<button @click="register">商家注册</button>
+		</div> -->
 		<div class="button-toSeller">
-			<button @click="toSeller">我是商家</button>
-		</div>
-		<div class="button-toSeller">
-			<button @click="toAdmin">我是管理员</button>
+			<button @click="toUser">我不是商家</button>
 		</div>
 
 		<!-- 底部菜单部分 -->
@@ -48,69 +45,66 @@
 	import NavFooter from '@/components/NavFooter.vue';
 
 	export default {
-		name: 'userLogin',
+		name: 'sellerLogin',
 		data() {
 			return {
-				userId: '',
+				sellerId: '',
 				password: '',
-				user:{userId: "777",
+				seller:{
+					sellerId:"777",
+					businessId: 777,
 					password:"777",
-					userName:"777",
-					userSex:1,
-					userImg:"",
-				
+					businessName:"777",
+					
+					
+					
 
 				},
 			}
 		},
 		methods: {
-			login() {
-				if (this.userId == '') {
-					alert('用户ID不能为空！');
-					return;
-				}
-				if (this.password == '') {
-					alert('密码不能为空！');
-					return;
-				}
-				// this.$setSessionStorage('user', this.user);
-				// this.$router.push({
-				// 	path: '/'
-				// });
-			this.$axios.post('UserController/getUserByIdByPass', this.$qs.stringify({
-			userId: this.userId,
-			password: this.password
-			})).then(response => {
-			let user = response.data.data;
-			if (user == null) {
-			alert('用户名或密码不正确！');
-			} else {
-			// sessionstorage有容量限制，为了防止数据溢出，所以不将userImg数据放入session中
-			user.userImg = '';
-			this.$setSessionStorage('user', user);
-			this.$router.push({
-			path: '/'
-			});
-			}
-			}).catch(error => {
-			console.error(error);
-			});
-			},
+            login() {
+                    if (this.sellerId === '') {
+                        alert('管理员ID不能为空！');
+                        return;
+                    }
+                    if (this.password === '') {
+                        alert('密码不能为空！');
+                        return;
+                    }
+
+                    this.$axios.post('/api/auth', this.$qs.stringify({
+                        username: this.sellerId,  
+                        password: this.password,
+                        rememberMe: false
+                    })).then(response => {
+                        const token = response.data.token || response.data.id_token;
+                        if (!token) {
+                        alert('登录失败：未返回token');
+                        return;
+                        }
+                        sessionStorage.setItem('token', token);
+
+                        const admin = { adminId: this.sellerId };
+                        this.$setSessionStorage('admin', admin);
+
+                        this.$router.push({ path: '/adminPage'});
+                    }).catch(error => {
+                        console.error(error);
+                        alert('管理员名或密码错误！');
+                    });
+                    },
+
 			register() {
 				this.$router.push({
-					path: '/register'
+					path: '/sellerRegister'
 				});
 			},
-			toSeller(){
+			toUser() {
 				this.$router.push({
-					path: '/sellerLogin'
+					path: '/login'
 				});
 			},
-			toAdmin(){
-				this.$router.push({
-					path: '/adminLogin'
-				});
-			}
 		},
 		components: {
 			NavFooter

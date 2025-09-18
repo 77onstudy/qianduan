@@ -29,11 +29,11 @@
 			<button @click="login">商家登陆</button>
 		</div>
 
-		<div class="button-register">
+		<!-- <div class="button-register">
 			<button @click="register">商家注册</button>
-		</div>
+		</div> -->
 		<div class="button-toSeller">
-			<button @click="toUser">我是用户</button>
+			<button @click="toUser">我不是商家</button>
 		</div>
 
 		<!-- 底部菜单部分 -->

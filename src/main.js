@@ -22,6 +22,20 @@ const app = createApp(App)
 // 配置 axios
 axios.defaults.baseURL = 'http://localhost:8080/'
 
+// === 添加请求拦截器：统一给请求加上 token ===
+axios.interceptors.request.use(
+  config => {
+    const token = sessionStorage.getItem('token'); // 假设你把登录成功的 JWT 存到 sessionStorage
+    if (token) {
+      config.headers['Authorization'] = 'Bearer ' + token;
+    }
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
 // 添加全局属性 (Vue 3 方式)
 app.config.globalProperties.$axios = axios
 app.config.globalProperties.$qs = qs
@@ -37,6 +51,7 @@ app.config.globalProperties.$removeLocalStorage = removeLocalStorage
 router.beforeEach((to, from, next) => {
   const user = sessionStorage.getItem('user')
   const seller =sessionStorage.getItem('seller')
+  const admin =sessionStorage.getItem('admin')
   if (!(
     to.path === '/' || 
     to.path === '/index' || 
@@ -45,9 +60,10 @@ router.beforeEach((to, from, next) => {
     to.path === '/login' || 
     to.path === '/register'||
     to.path === '/sellerLogin'||
-    to.path === '/sellerRegister'
+    to.path === '/sellerRegister'||
+    to.path === '/adminLogin'
   )) {
-    if (user == null&&seller==null) {
+    if (user == null&&seller==null&&admin==null) {
       router.push('/login')
       
     }
