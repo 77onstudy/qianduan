@@ -76,18 +76,18 @@
 			}
 		},
 		methods: {
-			checkUserId() {
-				this.$axios.post('UserController/getUserById', this.$qs.stringify({
-					userId: this.user.userId,
-				})).then(response => {
-					if (response.data == 1) {
-						this.user.userId = '';
-						alert('此手机号码已存在！')
-					}
-				}).catch(error => {
-					console.error(error);
-				});
-			},
+			// checkUserId() {
+			// 	this.$axios.post('UserController/getUserById', this.$qs.stringify({
+			// 		userId: this.user.userId,
+			// 	})).then(response => {
+			// 		if (response.data == 1) {
+			// 			this.user.userId = '';
+			// 			alert('此手机号码已存在！')
+			// 		}
+			// 	}).catch(error => {
+			// 		console.error(error);
+			// 	});
+			// },
 			async register() {
 				if (this.user.userId == '') {
 					alert('手机号码不能为空！');
