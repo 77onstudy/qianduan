@@ -88,7 +88,7 @@
 					console.error(error);
 				});
 			},
-			register() {
+			async register() {
 				if (this.user.userId == '') {
 					alert('手机号码不能为空！');
 					return;
@@ -106,20 +106,56 @@
 					return;
 				}
 
-				// 注册请求
-				this.$axios.post('UserController/saveUser', this.$qs.stringify(
-					this.user
-				)).then(response => {
-					if (!response.data.code) {
-						
-						this.$router.go(-1);
-					} else {
-						alert(response.data.message);
+				try {
+					const body = {
+					id: Number(this.user.userId),
+					username: this.user.userName,
+					deleted: false,
+					authorities: [{ name: 'USER' }],
+					password: this.user.password
+					};
+
+					const resp = await this.$axios.post('/api/users', body, {
+					headers: { 'Content-Type': 'application/json', Accept: 'application/json' }
+					});
+
+					// —— 统一解析：尽可能从不同形态里取出“有效数据”和“消息” ——
+					const status = resp?.status ?? 0;
+					const raw = resp?.data;
+					const wrappedOk = raw && (raw.success === true || raw.code === 'OK' || raw.code === 0);
+					const payload = raw?.data ?? raw; // 兼容 {data:{...}} 或 直接 {...}
+					const hasEntityLike =
+					payload && (payload.id != null || payload.username != null);
+
+					// 判定成功的多重兜底：
+					const ok = (status >= 200 && status < 300) && (wrappedOk || hasEntityLike || raw === '' || raw == null);
+
+					if (ok) {
+					// 可选：展示后端返回的用户名/ID
+					const uname = payload?.username ?? this.user.userName;
+					alert(`注册成功：${uname}`);
+					this.$router.go(-1);
+					return;
 					}
-				}).catch(error => {
+
+					// 非 OK 的情况，尽力给出后端的错误信息
+					const msg =
+					raw?.message ||
+					raw?.error ||
+					(typeof raw === 'string' ? raw : '') ||
+					`注册失败（状态码：${status}）`;
+					alert(msg);
+				} catch (error) {
 					console.error(error);
-				});
-			}
+					const msg =
+					error?.response?.data?.message ||
+					error?.response?.data?.error ||
+					error?.message ||
+					'注册失败';
+					alert(msg);
+				}
+				}
+
 		},
 		components: {
 			NavFooter
