@@ -2,7 +2,7 @@
 <template>
   <div class="admin-wrapper">
     <header class="admin-header">
-      <h2>商家管理（管理员）</h2>
+      <h2>店铺管理（管理员）</h2>
       <div class="actions">
         <button @click="loadBusinesses" :disabled="loading">
           {{ loading ? '刷新中...' : '刷新列表' }}
@@ -10,55 +10,64 @@
       </div>
     </header>
 
-    <!-- 新建商家 -->
-    <section class="card">
-      <h3>新建商家</h3>
-      <div class="form-grid">
-        <label>
-          商家名称
-          <input v-model.trim="form.businessName" placeholder="如：半亩方塘便当" />
-        </label>
-        <label>
-          店主用户ID
-          <input type="number" v-model.number="form.businessOwnerId" placeholder="绑定已存在且已激活的用户ID" />
-        </label>
-        <label>
-          起送价
-          <input type="number" step="0.01" v-model.number="form.startPrice" placeholder="0.00" />
-        </label>
-        <label>
-          配送费
-          <input type="number" step="0.01" v-model.number="form.deliveryPrice" placeholder="0.00" />
-        </label>
-        <label class="col-span-2">
-          地址
-          <input v-model.trim="form.businessAddress" placeholder="详细地址" />
-        </label>
-        <label class="col-span-2">
-          说明
-          <input v-model.trim="form.businessExplain" placeholder="商家简介/说明" />
-        </label>
-        <label class="col-span-2">
-          备注
-          <input v-model.trim="form.remarks" placeholder="可选" />
-        </label>
-        <label class="col-span-2">
-          封面图 URL
-          <input v-model.trim="form.businessImg" placeholder="https://..." />
-        </label>
-      </div>
-      <div class="form-actions">
-        <button @click="createBusiness" :disabled="creating">
-          {{ creating ? '提交中...' : '创建商家' }}
-        </button>
-        <button class="ghost" @click="resetForm" :disabled="creating">重置</button>
-      </div>
-    </section>
+<!-- 新建店铺 -->
+<section class="card">
+  <h3>新建店铺</h3>
+  <div class="form-grid">
+    <label>
+      店铺名称
+      <input v-model.trim="form.businessName" placeholder="如：半亩方塘便当" />
+    </label>
+    <label>
+      店主用户ID
+      <input type="number" v-model.number="form.businessOwnerId" placeholder="绑定已存在且已激活的用户ID" />
+    </label>
+    <label>
+      起送价
+      <input type="number" step="0.01" v-model.number="form.startPrice" placeholder="0.00" />
+    </label>
+    <label>
+      配送费
+      <input type="number" step="0.01" v-model.number="form.deliveryPrice" placeholder="0.00" />
+    </label>
 
-    <!-- 商家列表 -->
+    <!-- ✅ 新增：订单类型ID（orderTypeId） -->
+    <label>
+      订单类型ID
+      <input type="number" v-model.number="form.orderTypeId" placeholder="如：26" />
+    </label>
+
+    <label class="col-span-2">
+      地址
+      <input v-model.trim="form.businessAddress" placeholder="详细地址" />
+    </label>
+    <label class="col-span-2">
+      说明
+      <input v-model.trim="form.businessExplain" placeholder="店铺简介/说明" />
+    </label>
+    <label class="col-span-2">
+      备注
+      <input v-model.trim="form.remarks" placeholder="可选" />
+    </label>
+    <label class="col-span-2">
+      封面图 URL
+      <input v-model.trim="form.businessImg" placeholder="https://..." />
+    </label>
+  </div>
+  <div class="form-actions">
+    <button @click="createBusiness" :disabled="creating">
+      {{ creating ? '提交中...' : '创建店铺' }}
+    </button>
+    <button class="ghost" @click="resetForm" :disabled="creating">重置</button>
+  </div>
+  <div v-if="formError" class="error" style="margin-top:8px">{{ formError }}</div>
+</section>
+
+
+    <!-- 店铺列表 -->
     <section class="card">
       <div class="list-header">
-        <h3>商家列表</h3>
+        <h3>店铺列表</h3>
         <input
             class="search"
             v-model.trim="keyword"
@@ -102,8 +111,10 @@
             <div class="line text-dim">{{ b.remark || '' }}</div>
           </div>
           <div class="td ops">
+            <button @click="$router.push({ name: 'AdminBusinessEdit', params: { id: b.id } })">编辑</button>
             <button class="danger" @click="confirmDelete(b)">删除</button>
           </div>
+
         </div>
       </div>
     </section>
@@ -111,7 +122,7 @@
     <!-- 删除确认 -->
     <div v-if="confirming" class="modal-backdrop">
       <div class="modal">
-        <p>确定删除商家「{{ confirming?.name }}」（ID: {{ confirming?.id }}）吗？此操作不可恢复。</p>
+        <p>确定删除店铺「{{ confirming?.name }}」（ID: {{ confirming?.id }}）吗？此操作不可恢复。</p>
         <div class="modal-actions">
           <button class="danger" @click="deleteBusiness(confirming)">确定删除</button>
           <button class="ghost" @click="confirming = null">取消</button>
@@ -128,7 +139,7 @@ export default {
   data() {
     return {
       // ==== 按你的后端接口调整这里 ====
-      API_LIST: '/api/businesses/All',
+      API_LIST: '/api/businesses',
       API_CREATE: '/api/businesses',           // POST JSON 创建
       API_DELETE: (id) => `/api/businesses/${id}`, // DELETE 按 ID
       // ==================================
@@ -140,15 +151,17 @@ export default {
       keyword: '',
       // 创建表单——字段名对齐后端
       form: {
-        businessName: '',
-        businessOwnerId: null, // 用用户名绑定店主（后端据此查 User）
-        businessAddress: '',
-        businessExplain: '',
-        businessImg: '',
-        startPrice: null,
-        deliveryPrice: null,
-        remarks: ''
-      },
+              businessName: '',
+              businessOwnerId: null,
+              businessAddress: '',
+              businessExplain: '',
+              businessImg: '',
+              orderTypeId: null,       
+              startPrice: null,
+              deliveryPrice: null,
+              remarks: ''
+            },
+
       confirming: null
     };
   },
@@ -198,77 +211,125 @@ export default {
         this.items = list.map(this._mapBusinessRow);
       } catch (e) {
         console.error(e);
-        this.error = e?.response?.data?.message || '加载商家列表失败';
+        this.error = e?.response?.data?.message || '加载店铺列表失败';
       } finally {
         this.loading = false;
       }
     },
 
     resetForm() {
-      this.form = {
-        businessName: '',
-        businessOwnerUsername: '',
-        businessAddress: '',
-        businessExplain: '',
-        businessImg: '',
-        startPrice: null,
-        deliveryPrice: null,
-        remarks: ''
-      };
-    },
+          this.formError = '';
+          this.form = {
+            businessName: '',
+            businessOwnerId: null,
+            businessAddress: '',
+            businessExplain: '',
+            businessImg: '',
+            orderTypeId: null,   
+            startPrice: null,
+            deliveryPrice: null,
+            remarks: ''
+          };
+        },
 
-    async createBusiness() {
-      if (!this.form.businessName) return alert('请填写商家名称');
-      if (!this.form.businessOwnerUsername) return alert('请填写店主用户名');
 
-      this.creating = true;
-      this.error = '';
-      try {
-        // 直接把 JSON 按后端命名传过去（避免 415）
-        // 若后端要求 businessOwner 是对象（如 {id} 或 {username}），
-        // 可改为：businessOwner: { username: this.form.businessOwnerUsername }
-        const body = {
-          businessName: this.form.businessName,
-          businessAddress: this.form.businessAddress,
-          businessExplain: this.form.businessExplain,
-          businessImg: this.form.businessImg,
-          startPrice: this.form.startPrice,
-          deliveryPrice: this.form.deliveryPrice,
-          remarks: this.form.remarks,
-          // 后端要求是一个 User 实体，至少要带 id
-          businessOwner: { id: this.form.businessOwnerId }
-        };
+        async createBusiness() {
+              this.formError = '';
+              if (!this.form.businessName) {
+                this.formError = '请填写店铺名称';
+                return;
+              }
+              if (this.form.businessOwnerId == null || this.form.businessOwnerId === '') {
+                this.formError = '请填写店主用户ID';
+                return;
+              }
+              if (this.form.orderTypeId == null || this.form.orderTypeId === '') {
+                this.formError = '请填写订单类型ID';
+                return;
+              }
 
-        await this.$axios.post(this.API_CREATE, body);
-        // 为避免对返回体结构的依赖，创建后统一刷新列表
-        await this.loadBusinesses();
-        this.resetForm();
-        alert('创建成功');
-      } catch (e) {
-        console.error(e);
-        this.error = e?.response?.data?.message || '创建商家失败';
-      } finally {
-        this.creating = false;
-      }
-    },
+              const startPrice = this.form.startPrice == null || this.form.startPrice === '' ? null : Number(this.form.startPrice);
+              const deliveryPrice = this.form.deliveryPrice == null || this.form.deliveryPrice === '' ? null : Number(this.form.deliveryPrice);
+
+              if (startPrice != null && !Number.isFinite(startPrice)) {
+                this.formError = '起送价格式不正确';
+                return;
+              }
+              if (deliveryPrice != null && !Number.isFinite(deliveryPrice)) {
+                this.formError = '配送费格式不正确';
+                return;
+              }
+
+              this.creating = true;
+              this.error = '';
+              try {
+                // === 按 /api/businesses 要求的 body 字段发送 ===
+                const body = {
+                  businessName: this.form.businessName,
+                  businessOwner: { id: Number(this.form.businessOwnerId) }, // ✅ 嵌套对象只传 id
+                  businessAddress: this.form.businessAddress,
+                  businessExplain: this.form.businessExplain,
+                  businessImg: this.form.businessImg,
+                  orderTypeId: Number(this.form.orderTypeId),               // ✅ 新增字段
+                  startPrice: startPrice,
+                  deliveryPrice: deliveryPrice,
+                  remarks: this.form.remarks
+                };
+
+                await this.$axios.post(this.API_CREATE, body, {
+                  headers: { 'Content-Type': 'application/json', Accept: 'application/json' }
+                });
+
+                await this.loadBusinesses(); // 创建成功后刷新
+                this.resetForm();
+                alert('创建成功');
+              } catch (e) {
+                console.error(e);
+                this.formError =
+                  e?.response?.data?.message ||
+                  e?.response?.data?.error ||
+                  e?.message ||
+                  '创建店铺失败';
+              } finally {
+                this.creating = false;
+              }
+            },
+
 
     confirmDelete(biz) {
       this.confirming = biz;
     },
 
     async deleteBusiness(biz) {
-      if (!biz?.id) return alert('无效的商家ID');
-      try {
-        await this.$axios.delete(this.API_DELETE(biz.id));
-        // 本地移除，无需依赖返回体
-        this.items = this.items.filter(x => x.id !== biz.id);
-        this.confirming = null;
-        alert('删除成功');
-      } catch (e) {
-        console.error(e);
-        this.error = e?.response?.data?.message || '删除失败';
-      }
-    }
+          if (!biz?.id) {
+            alert('无效的商家ID');
+            return;
+          }
+
+          try {
+            console.log('[DELETE] 请求 -> /api/businesses/' + biz.id);
+
+            // 直接 DELETE /api/businesses/{id}
+            await this.$axios.delete(`/api/businesses/${biz.id}`, {
+              headers: { Accept: 'application/json' }
+            });
+
+            // 删除后刷新列表，确保前端和后端一致
+            await this.loadBusinesses();
+
+            this.confirming = null;
+            alert('删除成功');
+          } catch (e) {
+            console.error(e);
+            this.error =
+              e?.response?.data?.message ||
+              e?.response?.data?.error ||
+              e?.message ||
+              '删除失败';
+          }
+        }
+
+
   },
 
   mounted() {

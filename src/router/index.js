@@ -109,6 +109,12 @@ const routes = [
     path: '/editFood',
     component: () => import('@/views/editFood.vue')
   },
+  {
+    path: '/admin/businesses/:id/edit',
+    name: 'AdminBusinessEdit',
+    component: () => import('../views/AdminBusinessEdit.vue'),
+    props: true
+  }
 ]
 
 const router = createRouter({
