@@ -9,10 +9,10 @@
 		<div class="form-box">
 			<li>
 				<div class="title">
-					用户ID：
+					用户名：
 				</div>
 				<div class="content">
-					<input type="text" v-model="userId" placeholder="用户ID">
+					<input type="text" v-model="userName" placeholder="用户名">
 				</div>
 			</li>
 			<li>
@@ -51,15 +51,12 @@
 		name: 'userLogin',
 		data() {
 			return {
-				userId: '',
+				userName: '',
 				password: '',
-				user:{userId: "777",
-					password:"777",
-					userName:"777",
-					userSex:1,
-					userImg:"",
-				
-
+				user: {
+					userId: "用户id",
+					password: "password",
+					userName: "用户名",
 				},
 			}
 		},

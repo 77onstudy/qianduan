@@ -86,10 +86,10 @@
 
                         sessionStorage.setItem('token', token);
 
-                        const admin = { adminId: this.sellerId };
-                        this.$setSessionStorage('admin', admin);
+                        const seller = { sellerId: this.sellerId };
+                        this.$setSessionStorage('seller', seller);
 
-                        this.$router.push({ path: '/adminPage' });
+                        this.$router.push({ path: '/sellerPage' });
                         }).catch(error => {
                         console.error(error);
                         alert('商家名或密码错误！');
