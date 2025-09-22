@@ -33,7 +33,7 @@
 			<button @click="register">商家注册</button>
 		</div> -->
 		<div class="button-toSeller">
-			<button @click="toUser">我不是商家</button>
+			<button @click="toUser">我不是管理员</button>
 		</div>
 
 		<!-- 底部菜单部分 -->
