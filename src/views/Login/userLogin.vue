@@ -9,10 +9,10 @@
 		<div class="form-box">
 			<li>
 				<div class="title">
-					用户ID：
+					用户名：
 				</div>
 				<div class="content">
-					<input type="text" v-model="userId" placeholder="用户ID">
+					<input type="text" v-model="userName" placeholder="用户名">
 				</div>
 			</li>
 			<li>
@@ -33,7 +33,7 @@
 			<button @click="register">用户注册</button>
 		</div>
 		<div class="button-toSeller">
-			<button @click="toSeller">我是商家</button>
+			<button @click="toSeller">我是用户</button>
 		</div>
 		<div class="button-toSeller">
 			<button @click="toAdmin">我是管理员</button>
@@ -48,69 +48,96 @@
 	import NavFooter from '@/components/NavFooter.vue';
 
 	export default {
-		name: 'userLogin',
+		name: 'UserLogin',
 		data() {
 			return {
-				userId: '',
+				userName: '',
 				password: '',
-				user:{userId: "777",
-					password:"777",
-					userName:"777",
-					userSex:1,
-					userImg:"",
-				
-
+				user: {
+					userId: "用户id",
+					password: "password",
+					userName: "用户名",
 				},
 			}
 		},
 		methods: {
-			login() {
-				if (this.userId == '') {
-					alert('用户ID不能为空！');
+			async login() {
+				if (this.userName === '') {
+					alert('用户名不能为空！');
 					return;
 				}
-				if (this.password == '') {
+				if (this.password === '') {
 					alert('密码不能为空！');
 					return;
 				}
-				// this.$setSessionStorage('user', this.user);
-				// this.$router.push({
-				// 	path: '/'
-				// });
-			this.$axios.post('UserController/getUserByIdByPass', this.$qs.stringify({
-			userId: this.userId,
-			password: this.password
-			})).then(response => {
-			let user = response.data.data;
-			if (user == null) {
-			alert('用户名或密码不正确！');
-			} else {
-			// sessionstorage有容量限制，为了防止数据溢出，所以不将userImg数据放入session中
-			user.userImg = '';
-			this.$setSessionStorage('user', user);
-			this.$router.push({
-			path: '/'
-			});
-			}
-			}).catch(error => {
-			console.error(error);
-			});
+
+				try {
+					// 1. 等待认证请求完成
+					const authResponse = await this.$axios.post('/api/auth', {
+						username: this.userName,
+						password: this.password,
+						rememberMe: false
+					});
+
+					const token = authResponse.data.id_token || authResponse.data.token;
+					if (!token) {
+						alert('登录失败：未返回token');
+						return;
+					}
+					sessionStorage.setItem('token', token); // 存储token
+
+					// 2. 认证成功后，再等待获取用户信息的请求
+					const userResponse = await this.$axios.get('/api/user');
+					console.log('完整的响应对象:', userResponse);
+
+					// 修复点：直接使用 userResponse.data 作为用户数据
+					const userData = userResponse.data;
+
+					// 修复点：判断用户数据是否存在即可，无需判断不存在的 code 字段
+					if (userData) {
+						// 避免存储密码！
+						const user = {
+							userId: userData.id,
+							userName: userData.username,
+							// password: userData.password, // 切勿存储密码
+						};
+						this.$setSessionStorage('user', user); // 存储用户信息（不含密码）
+						this.$router.push({
+							path: '/user'
+						}); // 跳转页面
+						console.log('获取用户成功:', user);
+					} else {
+						// 虽然HTTP状态码是200，但返回的userData可能为null或undefined
+						console.log('查询的用户不存在');
+						this.$message.info('用户不存在');
+					}
+					// 完全移除原有的 else 分支（判断 res.code 的那个）
+				} catch (error) {
+					console.error('登录失败:', error);
+
+					// 以下错误处理保持不变，它是良好的实践
+					if (error.response?.status === 401) {
+						alert('用户名或密码错误！');
+					} else if (error.response?.status >= 500) {
+						alert('服务器开小差了，请稍后再试！');
+					} else if (error.request) {
+						alert('网络异常或无法连接服务器，请检查您的网络连接！');
+					} else {
+						alert('登录过程中发生未知错误，请稍后再试！');
+					}
+				}
 			},
+
 			register() {
 				this.$router.push({
-					path: '/register'
+					path: '/sellerRegister'
 				});
 			},
-			toSeller(){
+			toUser() {
 				this.$router.push({
-					path: '/sellerLogin'
+					path: '/login'
 				});
 			},
-			toAdmin(){
-				this.$router.push({
-					path: '/adminLogin'
-				});
-			}
 		},
 		components: {
 			NavFooter
@@ -210,6 +237,7 @@
 		outline: none;
 		border: solid 1px #DDD;
 	}
+
 	.wrapper .button-toSeller {
 		width: 100%;
 		box-sizing: border-box;
