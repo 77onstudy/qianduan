@@ -35,6 +35,7 @@
 				</template>
 				<template v-else>
 					<button class="ghost" @click="enableEditing">修改</button>
+					<button class="ghost" @click="goToAddress">我的地址</button>
 					<button class="ghost" @click="logout">退出登录</button>
 				</template>
 			</div>
@@ -101,6 +102,11 @@
 						console.error('请求失败:', error);
 						alert('请求失败');
 					});
+			},
+			goToAddress() {
+				this.$router.push({
+					name: 'UserAddress'
+				})
 			}
 		}
 	};
@@ -211,7 +217,8 @@
 	.btns {
 		display: flex;
 		justify-content: center;
-		gap: 5vw;
+		gap: 3vw;
+		/* 减小间距以适应更多按钮 */
 		margin-top: 4vw;
 		flex-wrap: wrap;
 	}
@@ -219,6 +226,15 @@
 	.btns.dual {
 		justify-content: space-between;
 	}
+
+	/* 添加响应式调整 */
+	@media (max-width: 480px) {
+		.btns {
+			flex-direction: column;
+			align-items: center;
+		}
+	}
+
 
 	.primary,
 	.ghost {

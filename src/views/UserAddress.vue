@@ -7,14 +7,14 @@
 
 		<!-- 地址列表部分 -->
 		<div class="addresslist">
-			<li v-for="item in deliveryAddressArr" :key="item.daId">
+			<li v-for="item in deliveryAddressArr" :key="item.id"> <!-- 键改为 id -->
 				<div class="addresslist-left" @click="setDeliveryAddress(item)">
 					<h3>{{item.contactName}}{{formatSex(item.contactSex)}} {{item.contactTel}}</h3>
 					<p>{{item.address}}</p>
 				</div>
 				<div class="addresslist-right">
-					<i class="fa fa-edit" @click="editUserAddress(item.daId)"></i>
-					<i class="fa fa-remove" @click="removeUserAddress(item.daId)"></i>
+					<i class="fa fa-edit" @click="editUserAddress(item.id)"></i> <!-- 改为 id -->
+					<i class="fa fa-remove" @click="removeUserAddress(item.id)"></i> <!-- 改为 id -->
 				</div>
 			</li>
 		</div>
@@ -42,7 +42,7 @@
 				deliveryAddressArr: []
 			}
 		},
-		created() {	
+		created() {
 			this.user = this.$getSessionStorage('user');
 			this.listDeliveryAddressByUserId();
 		},
@@ -51,21 +51,51 @@
 		},
 		methods: {
 			formatSex(value) {
-			return value == 1 ? '先生' : '女士';
+				return value == 1 ? '女士' : '先生'; // 根据后端实体，0-男，1-女
 			},
 			listDeliveryAddressByUserId() {
-				// 查询送货地址
-				this.$axios.post('DeliveryAddressController/listDeliveryAddressByUserId', this.$qs.stringify({
-					userId: this.user.userId
-				})).then(response => {
-					this.deliveryAddressArr = response.data;
-				}).catch(error => {
-					console.error(error);
-				});
+				// 获取当前用户的地址列表 GET /api/addresses
+				this.$axios.get('/api/addresses') // 使用GET请求
+					.then(response => {
+						console.log('地址接口完整响应:', response); // 调试用
+						// 根据你提供的实际响应结构，数据在 response.data.data 中，成功标志是 response.data.success
+						if (response.data && response.data.success === true && Array.isArray(response.data.data)) {
+							this.deliveryAddressArr = response.data.data;
+							console.log('成功获取地址列表:', this.deliveryAddressArr); // 调试用
+						} else {
+							console.error('返回数据格式错误或操作失败', response.data);
+							this.deliveryAddressArr = [];
+							// 可以根据 response.data.message 提示用户
+							// 例如：this.$message.error(response.data.message || '获取地址失败');
+						}
+					}).catch(error => {
+						console.error('获取地址列表失败:', error);
+						if (error.response) {
+							// 根据HTTP状态码处理不同错误
+							switch (error.response.status) {
+								case 404:
+									this.deliveryAddressArr = [];
+									// this.$message.info('暂无收货地址');
+									break;
+								case 401:
+									// this.$message.error('请重新登录');
+									// 可能需要跳转到登录页
+									break;
+								case 500:
+									// this.$message.error('服务器错误，请稍后重试');
+									break;
+								default:
+									// this.$message.error('获取地址失败，请重试');
+							}
+						} else {
+							// 网络错误或请求被取消等情况
+							// this.$message.error('网络连接失败，请检查网络');
+						}
+					});
 			},
 			setDeliveryAddress(deliveryAddress) {
 				// 把用户选择的默认送货地址存储到localStorage中
-				this.$setLocalStorage(this.user.userId, deliveryAddress);
+				this.$setLocalStorage('selectedDeliveryAddress', deliveryAddress);
 				this.$router.push({
 					path: '/orders',
 					query: {
@@ -81,34 +111,57 @@
 					}
 				});
 			},
-			editUserAddress(daId) {
+			editUserAddress(addressId) {
 				this.$router.push({
-					path: '/editUserAddress',
+					path: '/editUserAddress', // 你的编辑页面路由
 					query: {
 						businessId: this.businessId,
-						daId: daId
+						addressId: addressId // 传递地址ID
 					}
 				});
 			},
-			removeUserAddress(daId) {
+			removeUserAddress(addressId) {
 				if (!confirm('确认要删除此送货地址吗？')) {
 					return;
 				}
-				this.$axios.post('DeliveryAddressController/removeDeliveryAddress', this.$qs.stringify({
-					daId: daId
-				})).then(response => {
-					if (response.data > 0) {
-						let deliveryAddress = this.$getLocalStorage(this.user.userId);
-						if (deliveryAddress != null && deliveryAddress.daId == daId) {
-							this.$removeLocalStorage(this.user.userId);
+				// 删除地址 DELETE /api/addresses/{id}
+				this.$axios.delete(`/api/addresses/${addressId}`)
+					.then(response => {
+						// 根据你提供的实际响应结构，成功标志是 response.data.success
+						if (response.data && response.data.success === true) {
+
+							// *** 核心修改：直接从前端的地址数组中移除已删除的项 ***
+							this.deliveryAddressArr = this.deliveryAddressArr.filter(item => item.id !== addressId);
+
+							// 从本地存储中移除已删除的地址（如果是当前选中的）
+							let selectedAddress = this.$getLocalStorage('selectedDeliveryAddress');
+							if (selectedAddress && selectedAddress.id === addressId) {
+								this.$removeLocalStorage('selectedDeliveryAddress');
+							}
+
+							// 可以在这里给出成功提示
+							// this.$message.success('地址删除成功');
+						} else {
+							console.error('删除失败，服务器返回错误:', response.data);
+							// this.$message.error('删除地址失败！' + (response.data.message || ''));
 						}
-						this.listDeliveryAddressByUserId();
-					} else {
-						alert('删除地址失败！');
-					}
-				}).catch(error => {
-					console.error(error);
-				});
+					}).catch(error => {
+						console.error('删除地址失败:', error);
+						if (error.response) {
+							switch (error.response.status) {
+								case 404:
+									// this.$message.error('地址不存在');
+									break;
+								case 401:
+									// this.$message.error('请重新登录');
+									break;
+								default:
+									// this.$message.error('删除地址失败，请重试');
+							}
+						} else {
+							// this.$message.error('网络连接失败，请检查网络');
+						}
+					});
 			}
 		}
 	}

@@ -116,7 +116,7 @@
 					console.error('登录失败:', error);
 
 					// 以下错误处理保持不变，它是良好的实践
-					if (error.response?.status === 401) {
+					if (error.response?.status === 403) {
 						alert('用户名或密码错误！');
 					} else if (error.response?.status >= 500) {
 						alert('服务器开小差了，请稍后再试！');
