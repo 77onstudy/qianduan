@@ -47,69 +47,88 @@
 </template>
 
 <script>
-	import NavFooter from '../components/NavFooter.vue';
+import NavFooter from '../components/NavFooter.vue';
 
-	export default {
-		name: 'PaymentPage',
-		data() {
-			return {
-				orderId: this.$route.query.orderId,
-				orders: {
-					business: {}
-				},
-				isShowDetailet: false,
-				paymentType: 'wechat' // 新增：当前选中的支付方式
-			}
-		},
-		created() {
-			this.$axios.post('OrdersController/getOrdersById', this.$qs.stringify({
-				orderId: this.orderId
-			})).then(response => {
-				this.orders = response.data;
-			}).catch(error => {
-				console.error(error);
-			});
-		},
-		mounted() {
-			history.pushState(null, null, document.URL);
-			window.onpopstate = () => {
-				this.$router.push({
-					path: '/index'
-				});
-			}
-		},
-		unmounted() {
-			window.onpopstate = null;
-		},
-		methods: {
-			detailetShow() {
-				this.isShowDetailet = !this.isShowDetailet;
-			},
-			// 新增：选择支付方式方法
-			selectPayment(type) {
-				this.paymentType = type;
-			},
-			confirmPayment() {
-				// 1. 调用支付接口
-				this.$axios.post('OrdersController/payOrder', this.$qs.stringify({
-					orderId: this.orderId,
-				})).then(response => {
-					if (response.data === 1) {
-						// 2. 支付成功，跳转到订单列表页
-						this.$router.push('/orderList');
-					} else {
-						alert('支付失败，请重试！');
-					}
-				}).catch(error => {
-					console.error(error);
-					alert('支付请求出错，请检查网络');
-				});
-			}
-		},
-		components: {
-			NavFooter
-		}
-	}
+export default {
+  name: 'PaymentPage',
+  data() {
+    return {
+      orderId: this.$route.query.orderId,
+      orders: { business: {}, list: [] },
+      isShowDetailet: false,
+      paymentType: 'wechat'
+    }
+  },
+  created() {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      alert('请先登录！');
+      this.$router.push('/login');
+      return;
+    }
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
+    // 获取订单详情：GET /api/orders/{id}
+    this.$axios.get(`/api/orders/${this.orderId}`, config)
+      .then(res => {
+        const r = res.data || {};
+        if (r.success) {
+          // 字段兼容：把后端的 orderDetails 映射到前端沿用的 list
+          const data = r.data || {};
+          data.list = data.orderDetails || [];
+          // 兼容 orderId
+          data.orderId = data.id;
+          this.orders = data;
+        } else {
+          alert(r.message || '获取订单失败');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('网络错误，无法获取订单信息');
+      });
+  },
+  mounted() {
+    history.pushState(null, null, document.URL);
+    window.onpopstate = () => this.$router.push({ path: '/index' });
+  },
+  unmounted() {
+    window.onpopstate = null;
+  },
+  methods: {
+    detailetShow() {
+      this.isShowDetailet = !this.isShowDetailet;
+    },
+    selectPayment(type) {
+      this.paymentType = type;
+    },
+    confirmPayment() {
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        alert('请先登录！');
+        this.$router.push('/login');
+        return;
+      }
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      // 支付订单：PATCH /api/orders/pay/{id}
+      this.$axios.patch(`/api/orders/pay/${this.orderId}`, null, config)
+        .then(res => {
+          const r = res.data || {};
+          if (r.success) {
+            this.$router.push('/orderList');
+          } else {
+            alert(r.message || '支付失败，请重试！');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert('支付请求出错，请检查网络');
+        });
+    }
+  },
+  components: { NavFooter }
+}
 </script>
 
 <style scoped>

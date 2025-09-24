@@ -67,48 +67,56 @@
 </template>
 
 <script>
-  import NavFooter from '../components/NavFooter.vue';
+import NavFooter from '../components/NavFooter.vue';
 
-  export default {
-    name: 'OrderList',
-    data() {
-      return {
-        orderArr: [],
-        user: {}
-      }
-    },
-    created() {
-      this.user = this.$getSessionStorage('user');
-      this.$axios.post('OrdersController/listOrdersByUserId', this.$qs.stringify({
-        userId: this.user.userId
-      })).then(response => {
-        let result = response.data;
-        for (let orders of result) {
-          orders.isShowDetailet = false;
-        }
-        this.orderArr = result;
-      }).catch(error => {
-        console.error(error);
-      });
-    },
-    methods: {
-      detailetShow(orders) {
-        orders.isShowDetailet = !orders.isShowDetailet;
-      },
-      goToPayment(order) {
-        this.$router.push({
-          path: '/payment',
-          query: { 
-            orderId: order.orderId,
-            from: 'orderList' 
-          }
-        });
-      }
-    },
-    components: {
-      NavFooter
+export default {
+  name: 'OrderList',
+  data() {
+    return {
+      orderArr: [],
+      user: {}
     }
+  },
+  created() {
+    this.user = this.$getSessionStorage('user'); // { userId, userName, ... }
+    if (!this.user?.userId) {
+      alert('未获取到用户ID，请先登录');
+      return;
+    }
+
+    this.$axios.get('/api/orders', { params: { userId: this.user.userId } })
+      .then(res => {
+        const list = Array.isArray(res?.data?.data) ? res.data.data : [];
+        // 给每条记录加 isShowDetailet，并做轻微字段兜底
+        for (const o of list) {
+          o.isShowDetailet = false;
+          o.orderDetails = o.orderDetails || o.list || []; // 兼容旧字段
+        }
+        this.orderArr = list;
+      })
+      .catch(err => {
+        console.error(err);
+        alert(err?.response?.data?.message || '加载订单失败');
+      });
+  },
+  methods: {
+    detailetShow(orders) {
+      orders.isShowDetailet = !orders.isShowDetailet;
+    },
+    goToPayment(order) {
+      this.$router.push({
+        path: '/payment',
+        query: { 
+          orderId: order.id,            // 这里从 orderId 改为 id
+          from: 'orderList' 
+        }
+      });
+    }
+  },
+  components: {
+    NavFooter
   }
+}
 </script>
 
 <style scoped>
