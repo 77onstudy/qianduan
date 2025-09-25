@@ -113,156 +113,240 @@
 </script>
 
 <style scoped>
+.user-page {
+	padding: 5vw 4vw;
+	font-family: 'Segoe UI', sans-serif;
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 100vh;
+}
+
+/* 标题：移动端适中，桌面端自动变大 */
+h2 {
+	text-align: center;
+	margin-bottom: clamp(16px, 5vw, 40px);
+	font-size: clamp(20px, 5vw, 32px);
+}
+
+/* 卡片容器：移动端铺满，桌面端缩到合理宽度 */
+.card {
+	width: 100%;
+	max-width: 600px;
+	margin: 0 auto;
+	padding: clamp(16px, 5vw, 32px);
+	border-radius: 12px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+	box-sizing: border-box;
+	background: #fff;
+}
+
+/* 字段行：移动端纵向压缩，桌面端会切换为两列网格（见下方媒体查询） */
+.field {
+	display: flex;
+	align-items: center;
+	margin-bottom: 16px;
+	flex-wrap: nowrap;
+	min-height: 3em;
+	gap: 12px;
+}
+
+/* 标签：移动端窄，桌面端会用固定列宽 */
+.field label {
+	white-space: nowrap;
+	width: auto;
+	min-width: 60px;
+	font-size: clamp(14px, 4vw, 16px);
+	flex-shrink: 0;
+	margin-top: 0.25em;
+	color: #333;
+}
+
+/* 只读文本的展示 */
+.field span {
+	flex: 1;
+	font-size: clamp(14px, 4vw, 16px);
+	color: #111;
+}
+
+/* 输入组件（如密码） */
+.input {
+	flex: 1;
+	min-width: 0;
+	padding: 0.8em 0.9em;
+	font-size: clamp(14px, 4vw, 16px);
+	border: 1px solid #dcdcdc;
+	border-radius: 10px;
+	box-sizing: border-box;
+	width: 100%;
+}
+
+/* 密码操作区：按钮在右侧行内展示 */
+.password-box {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex: 1;
+}
+
+.text-btn {
+	background: none;
+	border: none;
+	color: #0a58ff;
+	cursor: pointer;
+	font-size: clamp(14px, 4vw, 16px);
+	white-space: nowrap;
+	padding: 4px 6px;
+	border-radius: 6px;
+}
+.text-btn:hover {
+	text-decoration: underline;
+}
+
+/* 头像：移动端相对小，桌面端用固定大尺寸（见媒体查询） */
+.avatar img {
+	width: clamp(60px, 20vw, 100px);
+	height: clamp(60px, 20vw, 100px);
+	border-radius: 50%;
+	border: 1px solid #eee;
+	object-fit: cover;
+}
+
+/* 按钮区：移动端居中换行，桌面端右对齐 */
+.btns {
+	display: flex;
+	justify-content: center;
+	gap: 12px;
+	margin-top: 16px;
+	flex-wrap: wrap;
+}
+.btns.dual {
+	justify-content: space-between;
+}
+
+/* 小屏“列”布局 */
+@media (max-width: 480px) {
+	.btns {
+		flex-direction: column;
+		align-items: stretch;
+	}
+}
+
+/* 通用按钮样式（移动端优先） */
+.primary,
+.ghost {
+	font-size: clamp(14px, 4vw, 16px);
+	padding: 10px 16px;
+	min-width: 140px;
+	text-align: center;
+	border: none;
+	border-radius: 10px;
+	cursor: pointer;
+	box-sizing: border-box;
+}
+.primary {
+	background-color: #0a58ff;
+	color: #fff;
+}
+.ghost {
+	background-color: #f5f5f5;
+	color: #333;
+}
+.primary:hover { background-color: #0849d4; }
+.ghost:hover { background-color: #e9e9e9; }
+
+/* ===== 平板 / 小桌面（>=768px）开始桌面化适配 ===== */
+@media (min-width: 768px) {
+
 	.user-page {
-		padding: 5vw;
-		font-family: 'Segoe UI', sans-serif;
-		box-sizing: border-box;
-		width: 100%;
-		min-height: 100vh;
+		padding: 48px 24px;
 	}
 
 	h2 {
-		text-align: center;
-		margin-bottom: 5vw;
-		font-size: 5vw;
+		margin-bottom: 32px;
 	}
 
 	.card {
-		width: 100%;
-		max-width: 600px;
-		margin: 0 auto;
-		padding: 5vw;
-		border-radius: 2vw;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-		box-sizing: border-box;
-		background: #fff;
+		max-width: 760px;
+		padding: 28px 32px;
+		border-radius: 14px;
 	}
 
+	/* 字段区域改为两列网格：左 140px label + 右自适应内容 */
 	.field {
-		display: flex;
+		display: grid;
+		grid-template-columns: 140px 1fr;
 		align-items: center;
-		margin-bottom: 16px;
-		flex-wrap: nowrap;
-		min-height: 3em;
+		gap: 12px 16px;
+		min-height: unset;
 	}
 
 	.field label {
-		white-space: nowrap;
-		width: 80px;
-		min-width: 60px;
-		font-size: 4vw;
-		flex-shrink: 0;
-		margin-top: 0.5em;
-	}
-
-	.field span {
-		flex: 1;
-		font-size: 4vw;
-	}
-
-	.gender-options {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 2vw;
-		font-size: 1rem;
-		/* 可调成 3.5vw 让它响应式 */
-	}
-
-	.gender-options input[type="radio"] {
-		transform: scale(1.2);
-		/* 放大圆圈 */
-	}
-
-	.input {
-		flex: 1;
-		min-width: 0;
-		padding: 1em;
-		font-size: 4vw;
-		border: 1px solid #ccc;
-		border-radius: 0.6em;
-		box-sizing: border-box;
 		width: 100%;
+		min-width: 140px;
+		margin-top: 0;
+		text-align: right;
+		padding-right: 4px;
+		color: #222;
 	}
 
-	.password-box {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		flex: 1;
+	/* 头像在桌面端固定更大，避免随容器变化 */
+	.avatar img {
+		width: 112px;
+		height: 112px;
 	}
 
+	/* 按钮区靠右；非编辑态三个操作按钮一行排开 */
+	.btns {
+		justify-content: flex-end;
+		gap: 12px;
+		margin-top: 20px;
+	}
+
+	/* 更像桌面按钮 */
+	.primary,
+	.ghost {
+		min-width: 120px;
+		padding: 10px 18px;
+		border-radius: 10px;
+	}
+}
+
+/* ===== 大桌面（>=1200px）进一步优化密度与宽度 ===== */
+@media (min-width: 1200px) {
+
+	.card {
+		max-width: 880px;
+		padding: 32px 40px;
+	}
+
+	.field {
+		grid-template-columns: 180px 1fr;
+		gap: 14px 20px;
+	}
+
+	.field label {
+		min-width: 180px;
+		font-size: 16px;
+	}
+
+	.field span,
+	.input,
 	.text-btn {
-		background: none;
-		border: none;
-		color: #007bff;
-		cursor: pointer;
-		font-size: 4vw;
-		white-space: nowrap;
+		font-size: 16px;
 	}
 
 	.avatar img {
-		width: 20vw;
-		max-width: 100px;
-		height: auto;
-		aspect-ratio: 1;
-		border-radius: 50%;
-		border: 1px solid #eee;
-		object-fit: cover;
-		max-width: 30vw;
-		/* 避免超出边框 */
-		min-width: 60px;
-		max-width: 100%;
+		width: 128px;
+		height: 128px;
 	}
-
-	.btns {
-		display: flex;
-		justify-content: center;
-		gap: 3vw;
-		/* 减小间距以适应更多按钮 */
-		margin-top: 4vw;
-		flex-wrap: wrap;
-	}
-
-	.btns.dual {
-		justify-content: space-between;
-	}
-
-	/* 添加响应式调整 */
-	@media (max-width: 480px) {
-		.btns {
-			flex-direction: column;
-			align-items: center;
-		}
-	}
-
 
 	.primary,
 	.ghost {
-		font-size: 4vw;
-		padding: 2vw 4vw;
-		min-width: 30vw;
-		text-align: center;
-		border: none;
-		border-radius: 1vw;
-		cursor: pointer;
-		box-sizing: border-box;
+		min-width: 132px;
+		padding: 12px 20px;
+		font-size: 16px;
+		border-radius: 12px;
 	}
+}
 
-	.primary {
-		background-color: #007bff;
-		color: white;
-	}
-
-	.ghost {
-		background-color: #f5f5f5;
-		color: #333;
-	}
-
-	.primary:hover {
-		background-color: #0056b3;
-	}
-
-	.ghost:hover {
-		background-color: #e0e0e0;
-	}
 </style>
