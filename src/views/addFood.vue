@@ -105,7 +105,7 @@ export default {
         this.businessId = Number(user.id);
 
         // 2) 拉取 business 完整实体
-        const bizWrap = await this.$axios.get(`/api/businesses/${encodeURIComponent(this.businessId)}`);
+        const bizWrap = await this.$axios.get(`/api/businesses/userId/${encodeURIComponent(this.businessId)}`);
         const business = this.unwrap(bizWrap);
         if (!business || !business.id) {
           alert('未获取到商家信息');

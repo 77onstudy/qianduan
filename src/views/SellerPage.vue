@@ -66,6 +66,7 @@ export default {
   name: 'SellerPage',
   data() {
     return {
+      id:null,
       loaded: false,
       orderTypes: [
         { id: 1, name: '美食' }, { id: 2, name: '早餐' }, { id: 3, name: '跑腿代购' },
@@ -122,7 +123,7 @@ export default {
         const id = Number(user.id);
 
         // 2) 用 id 拉完整实体
-        const bizWrap = await this.$axios.get(`/api/businesses/${encodeURIComponent(id)}`);
+        const bizWrap = await this.$axios.get(`/api/businesses/userId/${encodeURIComponent(id)}`);
         const data = this.unwrap(bizWrap);
         if (!data) {
           alert('未获取到店铺信息');
@@ -132,7 +133,7 @@ export default {
 
         // 保存完整体
         this.businessFull = { ...data, id };
-
+        this.id=data.id
         // 映射可编辑字段
         this.businessForm = {
           businessName: data.businessName ?? '',
@@ -201,7 +202,7 @@ export default {
 
       try {
         const resWrap = await this.$axios.put(
-          `/api/businesses/${encodeURIComponent(payload.id)}`,
+          `/api/businesses/${encodeURIComponent(this.id)}`,
           payload,
           { headers: { 'Content-Type': 'application/json' } }
         );
