@@ -8,7 +8,7 @@
     <!-- 订单列表部分 -->
     <h3>未支付订单信息：</h3>
     <div class="order">
-      <template v-for="item in orderArr" :key="item.orderId">
+      <template v-for="item in orderArr" :key="item.id || item.orderId">
         <div v-if="item.orderState==0">
           <div class="order-info">
             <div>
@@ -21,9 +21,12 @@
             </div>
           </div>
           <div class="order-detailet" v-show="item.isShowDetailet">
-            <div v-for="odItem in item.list" :key="odItem.food.foodId">
-              <p>{{odItem.food.foodName}} x {{odItem.quantity}}</p>
-              <p>&#165;{{odItem.food.foodPrice*odItem.quantity}}</p>
+            <div 
+              v-for="(odItem, i) in item.list"
+              :key="odItem.id || odItem.food?.id || i"
+            >
+              <p>{{ odItem.food?.foodName }} x {{ odItem.quantity ?? 0 }}</p>
+              <p>&#165;{{ ((odItem.food?.foodPrice ?? 0) * (odItem.quantity ?? 0)).toFixed(2) }}</p>
             </div>
             <div>
               <p>配送费</p>
@@ -36,7 +39,7 @@
 
     <h3>已支付订单信息：</h3>
     <div class="order">
-      <template v-for="item in orderArr" :key="item.orderId">
+      <template v-for="item in orderArr" :key="item.id || item.orderId">
         <div v-if="item.orderState==1">
           <div class="order-info">
             <p>
@@ -48,9 +51,12 @@
             </div>
           </div>
           <div class="order-detailet" v-show="item.isShowDetailet">
-            <div v-for="odItem in item.list" :key="odItem.food.foodId">
-              <p>{{odItem.food.foodName}} x {{odItem.quantity}}</p>
-              <p>&#165;{{odItem.food.foodPrice*odItem.quantity}}</p>
+            <div 
+              v-for="(odItem, i) in item.list"
+              :key="odItem.id || odItem.food?.id || i"
+            >
+            <p>{{ odItem.food?.foodName }} x {{ odItem.quantity ?? 0 }}</p>
+            <p>&#165;{{ ((odItem.food?.foodPrice ?? 0) * (odItem.quantity ?? 0)).toFixed(2) }}</p>
             </div>
             <div>
               <p>配送费</p>
@@ -84,20 +90,29 @@ export default {
       return;
     }
 
-    this.$axios.get('/api/orders', { params: { userId: this.user.userId } })
-      .then(res => {
-        const list = Array.isArray(res?.data?.data) ? res.data.data : [];
-        // 给每条记录加 isShowDetailet，并做轻微字段兜底
+    const token = sessionStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+    this.$axios.get('/api/user', { headers })
+      .then(userRes => {
+        const id = userRes.data.id
+
+        return this.$axios.get(`/api/orders/userOrder/${id}`, { headers });
+      })
+      .then(ordersRes => {
+        const list = Array.isArray(ordersRes?.data?.data) ? ordersRes.data.data : [];
         for (const o of list) {
           o.isShowDetailet = false;
-          o.orderDetails = o.orderDetails || o.list || []; // 兼容旧字段
+          o.list = Array.isArray(o.orderDetails) ? o.orderDetails : (o.list || []);
+          o.orderId = o.id ?? o.orderId;
         }
         this.orderArr = list;
       })
       .catch(err => {
         console.error(err);
-        alert(err?.response?.data?.message || '加载订单失败');
+        alert(err?.response?.data?.message || err.message || '加载用户/订单失败');
       });
+
   },
   methods: {
     detailetShow(orders) {
