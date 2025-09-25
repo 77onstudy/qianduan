@@ -218,4 +218,108 @@ export default {
     justify-content: space-between;
     align-items: center;
   }
+  /* ===== Desktop overrides (≥768px) ===== */
+@media (min-width: 768px) {
+  .wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-bottom: 84px; /* 预留底部组件/滚动空间 */
+  }
+
+  /* 顶部栏：固定高度与字号 */
+  .wrapper header {
+    height: 64px;
+    font-size: 20px;
+    position: sticky;
+    top: 0;
+    left: 0;
+  }
+
+  /* 分段标题：避免过大间距与 vw 字号 */
+  .wrapper h3 {
+    margin-top: 80px;      /* 避开 header */
+    padding: 0 0 12px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #555;
+  }
+
+  /* 列表容器：竖向卡片流 */
+  .wrapper .order {
+    gap: 12px;
+  }
+
+  /* 订单卡片：白底、阴影、边框 */
+  .wrapper .order div .order-info {
+    padding: 14px 18px;
+    font-size: 16px;
+    color: #333;
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+  }
+
+  /* 右侧金额 + 操作区 */
+  .wrapper .order div .order-info .order-info-right {
+    width: auto;           /* 不再固定 30% */
+    gap: 12px;
+    align-items: center;
+  }
+  .wrapper .order div .order-info .order-info-right > div:first-child {
+    min-width: 88px;
+    text-align: right;
+    font-weight: 600;
+    color: #ff5a36;
+  }
+  .wrapper .order div .order-info .order-info-right .order-info-right-icon {
+    padding: 8px 14px;
+    margin-left: 0;
+    font-size: 14px;
+    background: #ff9f1a;
+    border-radius: 10px;
+    transition: filter .2s, transform .05s;
+    box-shadow: 0 4px 12px rgba(255,159,26,.25);
+  }
+  .wrapper .order div .order-info .order-info-right .order-info-right-icon:hover {
+    filter: brightness(.95);
+  }
+  .wrapper .order div .order-info .order-info-right .order-info-right-icon:active {
+    transform: scale(.98);
+  }
+
+  /* 订单明细：卡片化并与 order-info 视觉一致 */
+  .wrapper .order div .order-detailet {
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    overflow: hidden;
+  }
+  .wrapper .order div .order-detailet div {
+    padding: 12px 18px;
+    font-size: 15px;
+    color: #333;
+    border-bottom: 1px solid #f7f7f7;
+  }
+  .wrapper .order div .order-detailet div:last-child {
+    border-bottom: none;
+  }
+
+  /* 下拉箭头的点击区稍微放大些更好点按 */
+  .fa.fa-caret-down {
+    margin-left: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+}
+
+/* ===== Large Desktop (≥1200px) ===== */
+@media (min-width: 1200px) {
+  .wrapper { max-width: 1180px; }
+
+  .wrapper .order div .order-info { padding: 16px 20px; }
+  .wrapper .order div .order-detailet div { padding: 14px 20px; }
+}
+
 </style>

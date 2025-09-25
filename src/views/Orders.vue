@@ -529,4 +529,165 @@
 	.wrapper .total .total-right:active {
 		transform: scale(0.98); /* 点击收缩 */
 	}
+	/* ====== Desktop overrides（≥768px）====== */
+@media (min-width: 768px) {
+  /* 让内容在桌面看起来更“正常”的字号与间距 */
+  .wrapper {
+    max-width: 1100px;     /* 居中内容区 */
+    margin: 0 auto;
+    padding-bottom: 84px;  /* 预留底部条高度 */
+  }
+
+  /* 顶部导航：固定64px 高度，不再用 vw */
+  .wrapper header {
+    height: 64px;
+    font-size: 20px;
+    position: sticky;   /* 桌面用粘性吸顶更自然 */
+    top: 0;
+    left: 0;
+  }
+
+  /* 地址区改成白底卡片，和内容分离 */
+  .wrapper .order-info {
+    margin-top: 80px;                /* 避开 header */
+    background-color: #fff;
+    color: #333;
+    padding: 20px 24px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    border: 1px solid #f0f0f0;
+  }
+
+  .wrapper .order-info h5 {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+    opacity: 1;
+  }
+
+  .wrapper .order-info .order-info-address {
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #eaeaea;
+  }
+
+  .wrapper .order-info .order-info-address .address-text {
+    width: auto;
+    max-width: calc(100% - 28px);
+    font-size: 18px;
+    color: #222;
+  }
+
+  .wrapper .order-info .order-info-address .address-icon {
+    font-size: 18px;
+    color: #999;
+  }
+
+  .wrapper .order-info .contact-info {
+    font-size: 14px;
+    margin-top: 6px;
+    color: #666;
+  }
+
+  .wrapper .order-info .debug-info {
+    font-size: 12px;
+    color: #9aa4af;
+    margin-top: 6px;
+    opacity: .9;
+  }
+
+  /* 商家名称条 */
+  .wrapper .business-name {
+    padding: 18px 0;
+    font-size: 20px;
+    color: #222;
+    border-bottom: 1px solid #eee;
+    background-color: transparent;
+    margin: 16px 0 12px;
+  }
+
+  /* 商品列表卡片化 */
+  .wrapper .order-detailed {
+    margin: 0;                    /* 去掉两侧 2vw */
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    border: 1px solid #f0f0f0;
+  }
+
+  .wrapper .order-detailed .product-item {
+    height: auto;                 /* 高度自适应行高 */
+    padding: 16px 18px;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  .wrapper .order-detailed .product-item .food-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+  }
+
+  .wrapper .order-detailed .product-item .product-name {
+    font-size: 16px;
+    margin-left: 14px;
+    max-width: 560px;
+    color: #333;
+  }
+
+  .wrapper .order-detailed .product-item .product-price {
+    font-size: 18px;
+  }
+
+  .wrapper .order-detailed .empty-cart {
+    padding: 80px 24px;
+  }
+
+  .wrapper .order-detailed .empty-cart .empty-icon {
+    font-size: 72px;
+  }
+
+  .wrapper .order-detailed .empty-cart .empty-text {
+    font-size: 16px;
+  }
+
+  /* 配送费区 */
+  .wrapper .order-deliveryfee {
+    height: auto;
+    padding: 14px 18px;
+    margin: 14px 0;
+    border-radius: 12px;
+    border: 1px solid #f0f0f0;
+  }
+  .wrapper .order-deliveryfee .fee-label { font-size: 15px; }
+  .wrapper .order-deliveryfee .fee-value { font-size: 16px; }
+
+  /* 底部合计条：固定 64px；字号适配桌面 */
+  .wrapper .total {
+    height: 64px;
+    box-shadow: 0 -6px 18px rgba(0,0,0,.06);
+  }
+  .wrapper .total .total-left {
+    font-size: 18px;
+  }
+  .wrapper .total .total-left .total-amount {
+    font-size: 20px;
+  }
+  .wrapper .total .total-right {
+    font-size: 18px;
+  }
+}
+
+/* ====== Large Desktop（≥1200px）进一步优化间距与排版 ====== */
+@media (min-width: 1200px) {
+  .wrapper { max-width: 1180px; }
+
+  .wrapper .order-info { padding: 22px 26px; }
+  .wrapper .order-detailed .product-item { padding: 18px 20px; }
+  .wrapper .order-detailed .product-item .food-img {
+    width: 80px; height: 80px;
+  }
+  .wrapper .order-detailed .product-item .product-name {
+    max-width: 640px;
+  }
+}
+
 </style>

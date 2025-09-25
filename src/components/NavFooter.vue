@@ -4,10 +4,6 @@
 			<i class="fa fa-home"></i>
 			<p>首页</p>
 		</li>
-		<li @click="toHongbao">
-			<i class="fa fa-gift"></i>
-			<p>爆红包</p>
-		</li>
 		<li @click="toOrderList">
 			<i class="fa fa-file-text-o"></i>
 			<p>订单</p>
@@ -48,7 +44,7 @@
 <style scoped>
 	.footer {
 		width: 100%;
-		height: 14vw;
+		height: 5vw;
 		border-top: solid 1px #e0e0e0;
 		background-color: #fff;
 		position: fixed;
@@ -81,13 +77,12 @@
 	}
 
 	.footer li p {
-		font-size: 2.8vw;
-		margin-top: 1vw;
+		font-size: 0.8vw;
 		font-weight: 400;
 	}
 
 	.footer li i {
-		font-size: 5vw;
+		font-size: 1.5vw;
 		transition: all 0.2s ease;
 	}
 

@@ -29,7 +29,7 @@
             </td>
             <td>￥{{ formatPrice(food.foodPrice) }}</td>
             <td>
-              <!-- <button class="edit" @click="goToEdit(food.id)">编辑</button> -->
+              <button class="edit" @click="goToEdit(food.id)">编辑</button>
               <button class="delete" @click="deleteFood(food.id)">删除</button>
             </td>
           </tr>
