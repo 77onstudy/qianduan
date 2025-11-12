@@ -96,12 +96,16 @@
 			</table>
 		</div>
 	</div>
+	<NavFooter />
 </template>
 
 <script>
-
+import NavFooter from '@/components/NavFooter.vue';
 	export default {
 		name: 'BusinessList',
+		components: {
+		NavFooter
+	},
 		data() {
 			return {
 				loading: true,
@@ -117,15 +121,12 @@
 			this.user = this.$getSessionStorage && this.$getSessionStorage('user')
 
 			this.$axios
-				.get('/api/businesses/All')
+				.get('/api/businesses')
 				.then((response) => {
 					if (response.data && Array.isArray(response.data.data)) {
 						this.businessArr = response.data.data.map((x) => ({ ...x, quantity: 0 }))
 					} else {
 						this.businessArr = []
-					}
-					if (this.user && this.user.userId) {
-						this.listCart()
 					}
 				})
 				.catch((e) => {
@@ -209,25 +210,7 @@
 			resetFilter() {
 				this.keyword = ''
 			},
-			listCart() {
-				this.$axios
-					.post(
-						'CartController/listCart',
-						this.$qs.stringify({ userId: this.user.userId })
-					)
-					.then((response) => {
-						const cartArr = Array.isArray(response.data) ? response.data : []
-						for (const biz of this.businessArr) {
-							biz.quantity = 0
-							for (const cart of cartArr) {
-								if (cart.businessId == biz.id) {
-									biz.quantity += cart.quantity
-								}
-							}
-						}
-					})
-					.catch((e) => console.error(e))
-			},
+			
 			toggleSort(key) {
 				if (this.sortKey === key) {
 					this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc'
@@ -271,8 +254,8 @@
 	header {
 		width: 100%;
 		height: var(--header-h); /* ✅ 改掉 12vw */
-		background-color: #8097FF;
-		color: #fff;
+		background-color: #fff;
+		color: #000000;
 		font-size: 18px;
 		position: sticky;
 		top: 0;
@@ -307,20 +290,20 @@
 	.btn {
 		height: 32px;
 		padding: 0 12px;
-		border: 1px solid #4c6fff;
+		border: 1px solid #8faca5;
 		border-radius: 8px;
-		background: #4c6fff;
+		background: #8faca5;
 		color: #fff;
 		cursor: pointer;
 	}
 	.btn--ghost {
 		background: #fff;
-		color: #4c6fff;
+		color: #8faca5;
 	}
 	.btn--primary {
-		background: #4c6fff;
+		background: #8faca5;
 		color: #fff;
-		border: 1px solid #4c6fff;
+		border: 1px solid #8faca5;
 		border-radius: 6px;
 		padding: 6px 10px;
 		cursor: pointer;

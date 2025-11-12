@@ -5,36 +5,55 @@
 			<p>商家登陆</p>
 		</header>
 
-		<!-- 表单部分 -->
-		<div class="form-box">
-			<li>
-				<div class="title">
-					商家ID：
+		<!-- 主要内容区域 -->
+		<main class="main-content">
+			<!-- 表单部分 -->
+			<div class="form-container">
+				<div class="form-box">
+					<div class="input-group">
+						<div class="input-icon">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M14.9999 16.6667H4.99992C3.15898 16.6667 1.66675 15.1743 1.66675 13.3333V6.66667C1.66675 4.82573 3.15898 3.33333 4.99992 3.33333H14.9999C16.8409 3.33333 18.3333 4.82573 18.3333 6.66667V13.3333C18.3333 15.1743 16.8409 16.6667 14.9999 16.6667Z" stroke="#8faca5" stroke-width="1.5"/>
+								<path d="M6.66675 8.33333H13.3334" stroke="#8faca5" stroke-width="1.5" stroke-linecap="round"/>
+								<path d="M6.66675 11.6667H10.0001" stroke="#8faca5" stroke-width="1.5" stroke-linecap="round"/>
+							</svg>
+						</div>
+						<input type="text" v-model="sellerId" placeholder="请输入商家ID">
+					</div>
+					
+					<div class="input-group">
+						<div class="input-icon">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M15.8333 9.16667H4.16667C3.24619 9.16667 2.5 9.91286 2.5 10.8333V15.8333C2.5 16.7538 3.24619 17.5 4.16667 17.5H15.8333C16.7538 17.5 17.5 16.7538 17.5 15.8333V10.8333C17.5 9.91286 16.7538 9.16667 15.8333 9.16667Z" stroke="#8faca5" stroke-width="1.5"/>
+								<path d="M5.83333 9.16667V5.83333C5.83333 4.72827 6.27232 3.66847 7.05372 2.88706C7.83513 2.10565 8.89493 1.66667 10 1.66667C11.1051 1.66667 12.1649 2.10565 12.9463 2.88706C13.7277 3.66847 14.1667 4.72827 14.1667 5.83333V9.16667" stroke="#8faca5" stroke-width="1.5" stroke-linecap="round"/>
+							</svg>
+						</div>
+						<input type="password" v-model="password" placeholder="请输入密码">
+					</div>
 				</div>
-				<div class="content">
-					<input type="text" v-model="sellerId" placeholder="商家ID">
-				</div>
-			</li>
-			<li>
-				<div class="title">
-					密码：
-				</div>
-				<div class="content">
-					<input type="password" v-model="password" placeholder="密码">
-				</div>
-			</li>
-		</div>
 
-		<div class="button-login">
-			<button @click="login">商家登陆</button>
-		</div>
+				<div class="button-login">
+					<button @click="login" class="login-btn">
+						<span>商家登陆</span>
+						<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M4.16675 10H15.8334" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M10.8334 5L15.8334 10L10.8334 15" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+					</button>
+				</div>
 
-		<!-- <div class="button-register">
-			<button @click="register">商家注册</button>
-		</div> -->
-		<div class="button-toSeller">
-			<button @click="toUser">我不是商家</button>
-		</div>
+				<div class="button-group">
+					<button @click="toUser" class="secondary-btn">返回</button>
+				</div>
+			</div>
+			
+			<!-- 装饰元素 -->
+			<div class="decoration">
+				<div class="circle circle-1"></div>
+				<div class="circle circle-2"></div>
+				<div class="circle circle-3"></div>
+			</div>
+		</main>
 
 		<!-- 底部菜单部分 -->
 		<NavFooter></NavFooter>
@@ -117,213 +136,225 @@
 	/****************** 总容器 ******************/
 	.wrapper {
 		width: 100%;
-		height: 100%;
-
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+		position: relative;
+		overflow: hidden;
 	}
 
 	/****************** header部分 ******************/
 	.wrapper header {
 		width: 100%;
-		height: 12vw;
-		background-color: #0097FF;
+		height: 70px;
+		background-color: #8faca5;
 		color: #fff;
-		font-size: 4.8vw;
-		position: fixed;
+		font-size: 22px;
+		font-weight: 600;
+		position: sticky;
 		left: 0;
 		top: 0;
 		z-index: 1000;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		box-shadow: 0 2px 10px rgba(143, 172, 165, 0.2);
+	}
+
+	/****************** 主要内容区域 ******************/
+	.main-content {
+		flex: 1;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 20px;
+		position: relative;
+	}
+
+	/****************** 表单容器 ******************/
+	.form-container {
+		width: 100%;
+		max-width: 420px;
+		background: #fff;
+		border-radius: 16px;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+		padding: 40px 30px;
+		position: relative;
+		z-index: 10;
 	}
 
 	/****************** 表单部分 ******************/
-	.wrapper .form-box {
-		width: 100%;
-		margin-top: 12vw;
+	.form-box {
+		margin-bottom: 30px;
 	}
 
-	.wrapper .form-box li {
+	.input-group {
+		position: relative;
+		margin-bottom: 24px;
+	}
+
+	.input-icon {
+		position: absolute;
+		left: 16px;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 2;
+	}
+
+	.input-group input {
+		width: 100%;
+		height: 52px;
+		padding: 0 20px 0 50px;
+		border: 1.5px solid #e1e8ed;
+		border-radius: 12px;
+		font-size: 16px;
+		background: #fafbfc;
+		transition: all 0.3s ease;
 		box-sizing: border-box;
-		padding: 4vw 3vw 0 3vw;
+	}
+
+	.input-group input:focus {
+		outline: none;
+		border-color: #8faca5;
+		background: #fff;
+		box-shadow: 0 0 0 3px rgba(143, 172, 165, 0.1);
+	}
+
+	.input-group input::placeholder {
+		color: #aab8c2;
+	}
+
+	/****************** 按钮样式 ******************/
+	.button-login {
+		margin-bottom: 20px;
+	}
+
+	.login-btn {
+		width: 100%;
+		height: 52px;
+		background: linear-gradient(135deg, #8faca5 0%, #7a9c94 100%);
+		color: #fff;
+		border: none;
+		border-radius: 12px;
+		font-size: 16px;
+		font-weight: 600;
 		display: flex;
 		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 12px rgba(143, 172, 165, 0.3);
 	}
 
-	.wrapper .form-box li .title {
-		flex: 0 0 18vw;
-		font-size: 3vw;
-		font-weight: 700;
-		color: #666;
+	.login-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(143, 172, 165, 0.4);
 	}
 
-	.wrapper .form-box li .content {
-		flex: 1;
+	.login-btn:active {
+		transform: translateY(0);
 	}
 
-	.wrapper .form-box li .content input {
-		border: none;
-		outline: none;
+	.button-group {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.secondary-btn {
 		width: 100%;
-		height: 4vw;
-		font-size: 3vw;
+		height: 44px;
+		background: #f8f9fa;
+		color: #5a6c7d;
+		border: 1.5px solid #e1e8ed;
+		border-radius: 10px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
 	}
 
-	.wrapper .button-login {
+	.secondary-btn:hover {
+		background: #edf2f7;
+		border-color: #8faca5;
+		color: #8faca5;
+	}
+
+	/****************** 装饰元素 ******************/
+	.decoration {
+		position: absolute;
+		top: 0;
+		left: 0;
 		width: 100%;
-		box-sizing: border-box;
-		padding: 4vw 3vw 0 3vw;
+		height: 100%;
+		overflow: hidden;
+		pointer-events: none;
 	}
 
-	.wrapper .button-login button {
-		width: 100%;
-		height: 10vw;
-		font-size: 3.8vw;
-		font-weight: 700;
-		color: #fff;
-		background-color: #38CA73;
-		border-radius: 4px;
-		border: none;
-		outline: none;
+	.circle {
+		position: absolute;
+		border-radius: 50%;
+		background: rgba(143, 172, 165, 0.05);
 	}
 
-	.wrapper .button-register {
-		width: 100%;
-		box-sizing: border-box;
-		padding: 4vw 3vw 0 3vw;
+	.circle-1 {
+		width: 200px;
+		height: 200px;
+		top: 10%;
+		right: 10%;
 	}
 
-	.wrapper .button-register button {
-		width: 100%;
-		height: 10vw;
-		font-size: 3.8vw;
-		font-weight: 700;
-		color: #666;
-		background-color: #EEE;
-		border-radius: 4px;
-		border: none;
-		outline: none;
-		border: solid 1px #DDD;
-	}
-	.wrapper .button-toSeller {
-		width: 100%;
-		box-sizing: border-box;
-		padding: 4vw 3vw 0 3vw;
+	.circle-2 {
+		width: 150px;
+		height: 150px;
+		bottom: 15%;
+		left: 5%;
 	}
 
-	.wrapper .button-toSeller button {
-		width: 100%;
-		height: 10vw;
-		font-size: 3.8vw;
-		font-weight: 700;
-		color: #666;
-		background-color: #EEE;
-		border-radius: 4px;
-		border: none;
-		outline: none;
-		border: solid 1px #DDD;
+	.circle-3 {
+		width: 100px;
+		height: 100px;
+		bottom: 30%;
+		right: 20%;
 	}
-	/* ===== Desktop overrides (≥768px) ===== */
-@media (min-width: 768px) {
-  .wrapper {
-    max-width: 520px;         /* 居中窄卡片，更聚焦 */
-    margin: 0 auto;
-    padding-bottom: 64px;
-  }
 
-  /* 头部固定高度与字号 */
-  .wrapper header {
-    height: 64px;
-    font-size: 20px;
-    position: sticky;
-    top: 0;
-    left: 0;
-  }
+	/****************** 响应式设计 ******************/
+	@media (max-width: 768px) {
+		.form-container {
+			padding: 30px 20px;
+			margin: 20px;
+		}
+		
+		.wrapper header {
+			height: 60px;
+			font-size: 18px;
+		}
+		
+		.main-content {
+			padding: 10px;
+		}
+	}
 
-  /* 表单外层卡片化 */
-  .wrapper .form-box {
-    width: 100%;
-    margin-top: 80px;         /* 避开 header */
-    background: #fff;
-    border: 1px solid #f0f0f0;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.06);
-    padding: 8px 0;
-  }
-
-  /* 单行：改成两列布局（标签 + 输入） */
-  .wrapper .form-box li {
-    padding: 12px 20px;
-    display: grid;
-    grid-template-columns: 110px 1fr;  /* 左 110px 右自适应 */
-    align-items: center;
-    gap: 12px;
-  }
-
-  .wrapper .form-box li .title {
-    flex: unset;
-    font-size: 14px;
-    font-weight: 600;
-    color: #444;
-  }
-
-  .wrapper .form-box li .content { flex: unset; }
-
-  .wrapper .form-box li .content input {
-    width: 100%;
-    height: 44px;             /* 桌面表单常见高度 */
-    font-size: 16px;
-    padding: 0 12px;
-    border: 1px solid #e6e6e6;
-    border-radius: 8px;
-    outline: none;
-  }
-  .wrapper .form-box li .content input:focus {
-    border-color: #0097ff;
-    box-shadow: 0 0 0 3px rgba(0,151,255,.12);
-  }
-
-  /* 主按钮/次按钮：统一高度与圆角 */
-  .wrapper .button-login,
-  .wrapper .button-register,
-  .wrapper .button-toSeller {
-    padding: 16px 0 0;        /* 与卡片分离 */
-  }
-
-  .wrapper .button-login button,
-  .wrapper .button-register button,
-  .wrapper .button-toSeller button {
-    height: 44px;
-    font-size: 16px;
-    border-radius: 10px;
-  }
-
-  /* 主按钮视觉优化 */
-  .wrapper .button-login button {
-    background: #38CA73;
-    transition: filter .2s, transform .05s;
-  }
-  .wrapper .button-login button:hover { filter: brightness(.96); }
-  .wrapper .button-login button:active { transform: scale(.99); }
-
-  /* 次按钮（“我不是管理员”）更轻量 */
-  .wrapper .button-toSeller button {
-    background: #f6f7f9;
-    color: #333;
-    border: 1px solid #e6e6e6;
-  }
-
-  /* 可选：桌面隐藏底部导航（如需保留可删掉这一段） */
-  .wrapper :deep(.footer),
-  .footer {
-    display: none;
-  }
-}
-
-/* ===== Large Desktop (≥1200px) 细节微调 ===== */
-@media (min-width: 1200px) {
-  .wrapper { max-width: 560px; }
-  .wrapper .form-box li { padding: 14px 22px; }
-}
-
+	@media (max-width: 480px) {
+		.form-container {
+			padding: 25px 15px;
+		}
+		
+		.input-group input {
+			height: 48px;
+			font-size: 15px;
+		}
+		
+		.login-btn {
+			height: 48px;
+			font-size: 15px;
+		}
+		
+		.secondary-btn {
+			height: 42px;
+			font-size: 13px;
+		}
+	}
 </style>

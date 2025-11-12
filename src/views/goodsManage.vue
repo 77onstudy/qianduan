@@ -73,7 +73,15 @@ export default {
           alert('无法获取商家ID，请登录后重试');
           return;
         }
-        this.businessId = Number(user.id);
+        const id = Number(user.id);
+        const bizWrap = await this.$axios.get(`/api/businesses/userId/${encodeURIComponent(id)}`);
+        const data = this.unwrap(bizWrap);
+        if (!data.id) {
+          alert('未获取到店铺信息');
+          this.loaded = true;
+          return;
+        }
+        this.businessId = data.id;
 
         // 2) 拉取食品列表：/api/foods?businessId=xxx
         await this.getFoodList();
@@ -87,7 +95,7 @@ export default {
 
     async getFoodList() {
       try {
-        const res = await this.$axios.get('/api/foods', { params: { businessId: this.businessId } });
+        const res = await this.$axios.get('/api/foods', { params: { business: this.businessId } });
         const list = this.unwrap(res);
         this.foodList = Array.isArray(list) ? list : [];
       } catch (err) {

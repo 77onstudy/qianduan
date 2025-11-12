@@ -114,7 +114,12 @@ const routes = [
     name: 'AdminBusinessEdit',
     component: () => import('../views/AdminBusinessEdit.vue'),
     props: true
-  }
+  },
+  {
+    path: '/favouriteBusinesses',
+    name: 'FavouriteBusinesses',
+    component: () => import('../views/FavouriteBusinesses.vue')
+  },
 ]
 
 const router = createRouter({

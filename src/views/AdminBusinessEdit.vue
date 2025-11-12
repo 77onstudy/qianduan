@@ -88,7 +88,7 @@
   
     methods: {
       goBack() {
-        this.$router.push({ name: 'AdminBusinessList' });
+        this.$router.push({path:'/adminPage'});
       },
   
       // 将后端的实体映射到表单

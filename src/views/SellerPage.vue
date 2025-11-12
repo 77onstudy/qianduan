@@ -1,7 +1,7 @@
 <template>
   <div class="seller-page">
     <h2>商家信息管理</h2>
-    <p v-if="businessFull.id != null" class="hint">当前店铺 ID：{{ businessFull.id }}</p>
+   
 
     <form v-if="loaded" @submit.prevent="submitForm">
       <div class="form-item">
@@ -113,7 +113,7 @@ export default {
     async init() {
       try {
         // 1) 先拿 /api/user 的 data.id
-        const userWrap = await this.$axios.get('/api/user');
+        const userWrap = await this.$axios.get('/api/user'); 
         const user = this.unwrap(userWrap);
         if (!user?.id) {
           alert('无法获取商家ID，请登录后重试');

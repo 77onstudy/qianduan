@@ -72,7 +72,7 @@
 
 	.footer li:hover, 
 	.footer li:active {
-		color: #4285f4; /* 红色改为蓝色 */
+		color: #8faca5; /* 红色改为蓝色 */
 		transform: translateY(-2px);
 	}
 

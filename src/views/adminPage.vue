@@ -271,7 +271,12 @@ export default {
 
       this.creatingPerson = true;
       try {
-        const body = { username: this.person.username }; // 只传 username
+        const body = { 
+          username: this.person.username,
+          authorities: [{
+							name: "BUSINESS"
+						}]      
+        }; // 只传 username
         const res = await this.$axios.post(this.API_PERSON_CREATE, body, {
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' }
         });
@@ -292,10 +297,7 @@ export default {
       } catch (e) {
         console.error(e);
         this.personError =
-          e?.response?.data?.message ||
-          e?.response?.data?.error ||
-          e?.message ||
-          '创建用户失败';
+          e?.response?.data
       } finally {
         this.creatingPerson = false;
       }

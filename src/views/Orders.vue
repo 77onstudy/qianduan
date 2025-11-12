@@ -1,63 +1,94 @@
 <template>
-	<div class="wrapper">
+	<div class="order-container">
 		<!-- 顶部导航 -->
-		<header>
-			<p>确认订单</p>
-		</header>
-
-		<!-- 地址区域：增加卡片质感 -->
-		<div class="order-info">
-			<h5>订单配送至：</h5>
-			<div class="order-info-address" @click="toUserAddress">
-				<p class="address-text">{{ deliveryaddress?.address || '请选择送货地址' }}</p>
-				<i class="fa fa-angle-right address-icon"></i>
+		<div class="order-header">
+			<!-- 添加返回按钮 -->
+			<div class="back-button" @click="$router.go(-1)">
+				<span class="back-symbol">&lt;</span>
 			</div>
-			<p class="contact-info">{{ user.userName }} {{ deliveryaddress?.contactTel || '' }}</p>
-			<!-- 调试信息：弱化样式，不干扰主视觉 -->
-			<div class="debug-info">
-				调试：地址ID={{ deliveryaddress?.id || '未设置' }} | 来源={{ addressSource || '未获取' }}
-			</div>
+			<h1>确认订单</h1>
 		</div>
 
-		<!-- 商家名称：增加底部间距，强化层级 -->
-		<h3 class="business-name">{{ business.businessName || '加载中...' }}</h3>
-
-		<!-- 商品列表：优化项间距和图片显示 -->
-		<div class="order-detailed">
-			<li class="product-item" v-for="item in filteredCartArr" :key="item.food.foodId">
-				<div class="product-left">
-					<img 
-						v-if="item.food.foodImg" 
-						:src="item.food.foodImg" 
-						:alt="item.food.foodName"
-						class="food-img"
-						loading="lazy"
-					>
-					<p class="product-name">{{ item.food.foodName }} x {{ item.quantity }}</p>
+		<div class="order-content">
+			<!-- 左侧内容 -->
+			<div class="order-left">
+				<!-- 地址区域 -->
+				<div class="address-section">
+					<h2>订单配送至</h2>
+					<div class="address-card" @click="toUserAddress">
+						<div class="address-info">
+							<div class="address-text">{{ deliveryaddress?.address || '请选择送货地址' }}</div>
+							<div class="contact-info">{{ deliveryaddress?.contactName || user.userName }} {{
+								deliveryaddress?.contactTel || '' }}</div>
+						</div>
+						<i class="fas fa-chevron-right address-icon"></i>
+					</div>
 				</div>
-				<p class="product-price">&#165;{{ (item.food.foodPrice * item.quantity).toFixed(2) }}</p>
-			</li>
-			<!-- 空购物车提示：优化排版和颜色 -->
-			<div class="empty-cart" v-if="filteredCartArr.length === 0">
-				<i class="fa fa-shopping-cart empty-icon"></i>
-				<p class="empty-text">购物车为空，无法下单</p>
-			</div>
-		</div>
 
-		<!-- 配送费：统一与商品项的视觉风格 -->
-		<div class="order-deliveryfee" v-if="business.deliveryPrice !== undefined">
-			<p class="fee-label">配送费</p>
-			<p class="fee-value">&#165;{{ business.deliveryPrice.toFixed(2) }}</p>
-		</div>
+				<!-- 商家信息 -->
+				<div class="business-info">
+					<div class="business-icon">
+						<img :src="business?.businessImg || placeholder" :alt="business?.businessName || '商家Logo'"
+							@error="onImgError">
+					</div>
+					<div class="business-name">{{ business.businessName || '加载中...' }}</div>
+				</div>
 
-		<!-- 底部合计：增加阴影和交互反馈 -->
-		<div class="total">
-			<div class="total-left">
-				<span class="total-label">实付：</span>
-				<span class="total-amount">&#165;{{ totalPrice.toFixed(2) }}</span>
+				<!-- 商品列表 -->
+				<div class="products-section">
+					<h3 class="section-title">商品清单</h3>
+					<div class="product-list">
+						<div class="product-item" v-for="item in filteredCartArr" :key="item.food.foodId">
+							<div class="product-left">
+								<div class="product-image">
+									<img :src="item.food.foodImg || placeholder" :alt="item.food.foodName || '商品图片'"
+										@error="onImgError">
+								</div>
+								<div class="product-details">
+									<div class="product-name">{{ item.food.foodName }}</div>
+									<div class="product-quantity">x {{ item.quantity }}</div>
+								</div>
+							</div>
+							<!-- 修改价格颜色为黑色 -->
+							<div class="product-price" style="color: #333;">¥{{ (item.food.foodPrice *
+								item.quantity).toFixed(2) }}</div>
+						</div>
+
+						<!-- 空购物车提示 -->
+						<div class="empty-cart" v-if="filteredCartArr.length === 0">
+							<i class="fas fa-shopping-cart empty-icon"></i>
+							<p class="empty-text">购物车为空，无法下单</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- 配送费 -->
+				<div class="delivery-fee" v-if="business.deliveryPrice !== undefined">
+					<div class="fee-label">配送费</div>
+					<div class="fee-value">¥{{ business.deliveryPrice.toFixed(2) }}</div>
+				</div>
 			</div>
-			<div class="total-right" @click="toPayment">
-				去支付
+
+			<!-- 右侧摘要 -->
+			<div class="order-right">
+				<h3 class="summary-title">订单摘要</h3>
+
+				<div class="summary-item">
+					<div class="summary-label">商品金额</div>
+					<div class="summary-value">¥{{ (totalPrice - (business.deliveryPrice || 0)).toFixed(2) }}</div>
+				</div>
+
+				<div class="summary-item" v-if="business.deliveryPrice !== undefined">
+					<div class="summary-label">配送费</div>
+					<div class="summary-value">¥{{ business.deliveryPrice.toFixed(2) }}</div>
+				</div>
+
+				<div class="summary-total">
+					<div class="total-label">实付：</div>
+					<div class="total-amount">¥{{ totalPrice.toFixed(2) }}</div>
+				</div>
+
+				<button class="pay-button" @click="toPayment">去支付</button>
 			</div>
 		</div>
 	</div>
@@ -72,15 +103,11 @@
 				business: {},
 				user: {},
 				cartArr: [],
-				deliveryaddress: null,
-				addressSource: '未获取' 
+				deliveryaddress: null
 			}
 		},
 		created() {
-			console.log('===== 订单页创建 =====');
 			this.user = this.$getSessionStorage('user') || {};
-			console.log('用户信息:', this.user);
-			console.log('路由参数:', this.$route.query);
 
 			this.handleAddressFromRoute();
 			if (!this.deliveryaddress) {
@@ -100,47 +127,39 @@
 			}
 			const config = {
 				headers: {
-					'Authorization': `Bearer ${token}` 
+					'Authorization': `Bearer ${token}`
 				}
 			};
 
 			// 获取商家信息
 			this.$axios.get(`/api/businesses/${this.businessId}`, config)
-			.then(response => {
-				if (response.data.success) {
-					this.business = response.data.data;
-					console.log('商家信息:', this.business);
-				} else {
-					console.error('获取商家失败:', response.data.message);
-					alert(`获取商家信息失败：${response.data.message}`);
-				}
-			})
-			.catch(error => {
-				console.error('商家请求错误:', error);
-				alert('网络错误，无法获取商家信息');
-			});
+				.then(response => {
+					if (response.data.success) {
+						this.business = response.data.data;
+					} else {
+						alert(`获取商家信息失败：${response.data.message}`);
+					}
+				})
+				.catch(() => {
+					alert('网络错误，无法获取商家信息');
+				});
 
 			// 获取购物车信息
 			this.$axios.get(`/api/carts/${this.businessId}`, config)
-			.then(response => {
-				if (response.data.success) {
-					this.cartArr = response.data.data.items || [];
-					console.log('购物车数据:', this.cartArr);
-				} else {
-					console.error('获取购物车失败:', response.data.message);
-					alert(`获取购物车失败：${response.data.message}`);
-				}
-			})
-			.catch(error => {
-				console.error('购物车请求错误:', error);
-				alert('网络错误，无法获取购物车信息');
-			});
+				.then(response => {
+					if (response.data.success) {
+						this.cartArr = response.data.data.items || [];
+					} else {
+						alert(`获取购物车失败：${response.data.message}`);
+					}
+				})
+				.catch(() => {
+					alert('网络错误，无法获取购物车信息');
+				});
 		},
 		computed: {
 			filteredCartArr() {
-				const result = this.cartArr.filter(item => item && item.food);
-				console.log('过滤后购物车:', result.length, '项');
-				return result;
+				return this.cartArr.filter(item => item && item.food);
 			},
 			totalPrice() {
 				let total = 0;
@@ -149,7 +168,18 @@
 				});
 				total += this.business.deliveryPrice || 0;
 				return Math.round(total * 100) / 100;
-			}
+			},
+			placeholder() {
+				return (
+					'data:image/svg+xml;utf8,' +
+					encodeURIComponent(
+						`<svg xmlns="http://www.w3.org/2000/svg" width="70" height="70">  <!-- 尺寸匹配商品图片容器 -->
+          <rect width="100%" height="100%" fill="#e2e8f0"/>  <!-- 背景色和商品容器一致 -->
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#94a3b8" font-size="12">No Image</text>
+        </svg>`
+					)
+				);
+			},
 		},
 		methods: {
 			handleAddressFromRoute() {
@@ -157,40 +187,22 @@
 				if (addressStr) {
 					try {
 						const address = JSON.parse(addressStr);
-						console.log('从路由参数解析地址:', address);
 						if (address.id && address.address && address.contactTel) {
 							this.deliveryaddress = address;
-							this.addressSource = '路由参数';
 							this.$setLocalStorage('selectedDeliveryAddress', address);
-							console.log('已同步路由地址到LocalStorage');
-						} else {
-							console.error('路由地址参数缺失关键字段', address);
 						}
 					} catch (e) {
-						console.error('解析路由地址失败:', e.message);
+						// 解析失败静默处理
 					}
-				} else {
-					console.log('路由参数中无address字段');
 				}
 			},
 			handleAddressFromLocalStorage() {
 				const storedAddress = this.$getLocalStorage('selectedDeliveryAddress');
-				console.log('从LocalStorage读取地址:', storedAddress);
 				if (storedAddress && storedAddress.id && storedAddress.address) {
 					this.deliveryaddress = storedAddress;
-					this.addressSource = 'LocalStorage';
-					console.log('LocalStorage地址生效');
-				} else {
-					console.log('LocalStorage无有效地址');
-					this.deliveryaddress = null;
-					this.addressSource = '无数据';
 				}
 			},
-			sexFilter(value) {
-				return value == 1 ? '先生' : '女士';
-			},
 			toUserAddress() {
-				console.log('跳转地址页，携带businessId:', this.businessId);
 				this.$router.push({
 					path: '/userAddress',
 					query: {
@@ -200,494 +212,459 @@
 				});
 			},
 			toPayment() {
-				// 基础校验
-				if(!this.user?.userId){
+				if (!this.user?.userId) {
 					alert('请先登录');
 					this.$router.push('/login');
 					return;
 				}
-				if(!this.deliveryaddress?.id){
+				if (!this.deliveryaddress?.id) {
 					alert('请选择送货地址！');
 					return;
 				}
-				if(!this.filteredCartArr.length){
+				if (!this.filteredCartArr.length) {
 					alert('购物车为空，无法下单');
 					return;
 				}
 				const token = sessionStorage.getItem('token');
-				if(!token){
+				if (!token) {
 					alert('登录已过期，请重新登录');
 					this.$router.push('/login');
 				}
-				
-				// 组装后端需要的订单负载：只传关联ID，其他让后端算
+
 				const payload = {
-					business: { id: Number(this.businessId) },
-					deliveryAddress: { id: Number(this.deliveryaddress.id) }
-					// 不要传 orderTotal / list，后端会根据购物车自动生成
+					business: {
+						id: Number(this.businessId)
+					},
+					deliveryAddress: {
+						id: Number(this.deliveryaddress.id)
+					}
 				};
 
-				const config = { headers: { Authorization: `Bearer ${token}` } };
+				const config = {
+					headers: {
+						Authorization: `Bearer ${token}`
+					}
+				};
 
-				// 创建订单
 				this.$axios.post('/api/orders', payload, config)
 					.then(res => {
-					if (res.data?.success) {
-						const created = res.data.data;   // 后端返回的订单对象
-						// 4) 跳转支付页，带上订单ID
-						this.$router.push({
-						path: '/payment',
-						query: { orderId: created.id, from: 'OrdersPage' }
-						});
-					} else {
-						alert(`创建订单失败：${res.data?.message || '未知错误'}`);
-					}
+						if (res.data?.success) {
+							const created = res.data.data;
+							this.$router.push({
+								path: '/payment',
+								query: {
+									orderId: created.id,
+									from: 'OrdersPage'
+								}
+							});
+						} else {
+							alert(`创建订单失败：${res.data?.message || '未知错误'}`);
+						}
 					})
-					.catch(err => {
-					console.error('创建订单异常：', err);
-					alert('网络错误，创建订单失败');
-				});
+					.catch(() => {
+						alert('网络错误，创建订单失败');
+					});
+			},
+			onImgError(e) {
+				e.target.src = this.placeholder;
 			}
 		}
 	}
 </script>
 
 <style scoped>
-	/* 基础样式：统一字体和盒模型 */
 	* {
 		margin: 0;
 		padding: 0;
 		box-sizing: border-box;
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+		font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
 	}
 
-	body {
-		background-color: #fafafa;
-	}
-
-	/****************** 总容器 ******************/
-	.wrapper {
+	.order-container {
 		width: 100%;
-		min-height: 100vh;
-		padding-bottom: 14vw; /* 给底部合计栏留空间 */
-	}
-
-	/****************** 顶部导航 ******************/
-	.wrapper header {
-		width: 100%;
-		height: 12vw;
-		background-color: #0097FF;
-		color: #fff;
-		font-size: 5vw;
-		font-weight: 500;
-		position: fixed;
-		left: 0;
-		top: 0;
-		z-index: 1000;
+		max-width: 1200px;
+		min-height: 80vh;
+		margin: 40px auto;
+		background: white;
+		border-radius: 20px;
+		box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+		overflow: hidden;
 		display: flex;
+		flex-direction: column;
+	}
+
+	/* 顶部导航 - 添加返回按钮 */
+	.order-header {
+		background: white;
+		padding: 25px 40px;
+		border-bottom: 1px solid #e2e8f0;
+		display: flex;
+		align-items: center;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+		position: relative;
+	}
+
+	.back-button {
+		position: absolute;
+		left: 20px;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		background: #f1f3f2;
+		display: flex;
+		align-items: center;
 		justify-content: center;
-		align-items: center;
-		box-shadow: 0 2px 8px rgba(0, 151, 255, 0.2); /* 增加顶部阴影，提升层次感 */
-	}
-
-	/****************** 地址区域 ******************/
-	.wrapper .order-info {
-		width: 100%;
-		margin-top: 12vw;
-		background-color: #0097EF;
-		padding: 3vw;
-		color: #fff;
-		border-radius: 0 0 12px 12px; /* 底部圆角，区分导航栏 */
-		box-shadow: 0 4px 12px rgba(0, 151, 239, 0.15); /* 增加阴影，模拟悬浮感 */
-	}
-
-	.wrapper .order-info h5 {
-		font-size: 3.2vw;
-		font-weight: 400;
-		margin-bottom: 2vw;
-		opacity: 0.9;
-	}
-
-	/* 地址卡片 */
-	.wrapper .order-info .order-info-address {
-		width: 100%;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		font-weight: 500;
-		user-select: none;
 		cursor: pointer;
-		padding: 2vw 0;
-		transition: background-color 0.2s;
-		border-radius: 8px;
-		padding: 2vw;
+		transition: all 0.3s ease;
 	}
 
-	/* 地址卡片 hover 反馈 */
-	.wrapper .order-info .order-info-address:hover {
-		background-color: rgba(255, 255, 255, 0.1);
+	.back-button:hover {
+		background: #8faca5;
+		color: white;
 	}
 
-	.wrapper .order-info .order-info-address .address-text {
-		width: 85%;
-		font-size: 4.8vw;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		line-height: 1.2;
+	.back-symbol {
+		font-size: 22px;
+		font-weight: 600;
 	}
 
-	.wrapper .order-info .order-info-address .address-icon {
-		font-size: 5vw;
-		opacity: 0.8;
+	.order-header h1 {
+		font-size: 26px;
+		font-weight: 600;
+		color: #1e293b;
+		margin: 0 auto;
 	}
 
-	/* 联系人信息 */
-	.wrapper .order-info .contact-info {
-		font-size: 3.2vw;
-		margin-top: 1vw;
-		opacity: 0.9;
+	/* 主体内容 */
+	.order-content {
+		display: flex;
+		flex: 1;
 	}
 
-	/* 调试信息：弱化处理 */
-	.wrapper .order-info .debug-info {
-		font-size: 1.8vw;
-		color: #e0f7ff; /* 浅蓝白色，不干扰主视觉 */
-		margin-top: 1.5vw;
-		opacity: 0.7;
+	/* 左侧内容 */
+	.order-left {
+		flex: 7;
+		padding: 40px;
+		border-right: 1px solid #e2e8f0;
+		display: flex;
+		flex-direction: column;
 	}
 
-	/****************** 商家名称 ******************/
-	.wrapper .business-name {
-		padding: 3.5vw;
-		font-size: 4.2vw;
-		color: #333; /* 加深颜色，提升可读性 */
-		border-bottom: 1px solid #eee; /* 柔和边框 */
-		background-color: #fff;
-		margin-bottom: 2vw;
+	/* 地址区域 */
+	.address-section {
+		background: #f8fafc;
+		border-radius: 16px;
+		padding: 25px;
+		margin-bottom: 35px;
+		border: 1px solid #e2e8f0;
+		transition: all 0.3s ease;
 	}
 
-	/****************** 商品列表 ******************/
-	.wrapper .order-detailed {
-		width: 100%;
-		background-color: #fff;
-		border-radius: 12px;
-		margin: 0 2vw;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-		overflow: hidden;
+	.address-section:hover {
+		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 	}
 
-	/* 商品项 */
-	.wrapper .order-detailed .product-item {
-		width: 100%;
-		height: 20vw; /* 增加高度，提升呼吸感 */
-		padding: 3vw;
-		color: #333;
+	.address-section h2 {
+		font-size: 18px;
+		color: #64748b;
+		margin-bottom: 15px;
+		font-weight: 500;
+	}
+
+	.address-card {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		border-bottom: 1px solid #f5f5f5;
-		list-style: none;
-		transition: background-color 0.2s;
+		cursor: pointer;
+		padding: 15px 0;
 	}
 
-	/* 商品项 hover 反馈 */
-	.wrapper .order-detailed .product-item:hover {
-		background-color: #fafafa;
+	.address-info {
+		flex: 1;
 	}
 
-	.wrapper .order-detailed .product-item .product-left {
+	.address-text {
+		font-size: 20px;
+		font-weight: 500;
+		color: #1e293b;
+		margin-bottom: 8px;
+		line-height: 1.4;
+	}
+
+	.contact-info {
+		font-size: 16px;
+		color: #64748b;
+	}
+
+	.address-icon {
+		color: #94a3b8;
+		font-size: 22px;
+	}
+
+	/* 商家信息 */
+	.business-info {
 		display: flex;
 		align-items: center;
+		margin-bottom: 35px;
+		padding: 20px;
+		background: #f8fafc;
+		border-radius: 12px;
+		border: 1px solid #e2e8f0;
 	}
 
-	/* 商品图片：固定比例，避免拉伸 */
-	.wrapper .order-detailed .product-item .food-img {
-		width: 14vw;
-		height: 14vw;
-		border-radius: 8px;
-		object-fit: cover; /* 保持图片比例 */
-		border: 1px solid #f0f0f0;
-	}
-
-	.wrapper .order-detailed .product-item .product-name {
-		font-size: 3.5vw;
-		margin-left: 3vw;
-		white-space: nowrap;
+	.business-icon {
+		width: 50px;
+		height: 50px;
+		border-radius: 12px;
+		background: #8faca5;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: white;
+		margin-right: 20px;
+		font-size: 20px;
 		overflow: hidden;
-		text-overflow: ellipsis;
-		color: #444;
-		max-width: 50vw; /* 限制宽度，避免挤压价格 */
+		/* 新增：防止图片超出容器 */
 	}
 
-	.wrapper .order-detailed .product-item .product-price {
-		font-size: 3.8vw;
+	/* 新增：商家图片适配样式 */
+	.business-icon img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		/* 保持图片比例，填充容器（不拉伸变形） */
+		display: block;
+	}
+
+	.business-name {
+		font-size: 22px;
+		font-weight: 600;
+		color: #1e293b;
+	}
+
+	/* 商品列表 */
+	.products-section {
+		margin-bottom: 30px;
+		flex: 1;
+	}
+
+	.section-title {
+		font-size: 18px;
+		color: #64748b;
+		margin-bottom: 20px;
 		font-weight: 500;
-		color: #ff4444; /* 价格红色，突出重点 */
+		padding-bottom: 10px;
+		border-bottom: 1px solid #e2e8f0;
 	}
 
-	/* 空购物车提示 */
-	.wrapper .order-detailed .empty-cart {
+	.product-list {
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+
+	.product-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 20px;
+		background: #f8fafc;
+		border-radius: 12px;
+		border: 1px solid #e2e8f0;
+		transition: all 0.3s ease;
+	}
+
+	.product-item:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+	}
+
+	.product-left {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+	}
+
+	.product-image {
+		width: 70px;
+		height: 70px;
+		border-radius: 10px;
+		background: #e2e8f0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #94a3b8;
+		font-size: 24px;
+		overflow: hidden;
+	}
+
+	.product-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		/* 保持图片比例，填充容器 */
+		display: block;
+	}
+
+	.product-details {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.product-name {
+		font-size: 18px;
+		font-weight: 500;
+		color: #1e293b;
+		margin-bottom: 6px;
+	}
+
+	.product-quantity {
+		font-size: 16px;
+		color: #64748b;
+	}
+
+	/* 修改价格颜色为黑色 */
+	.product-price {
+		font-size: 18px;
+		font-weight: 600;
+		color: #333;
+		/* 改为黑色 */
+	}
+
+	/* 空购物车 */
+	.empty-cart {
 		text-align: center;
-		padding: 12vw 5vw;
-		color: #999;
+		padding: 80px 24px;
+		color: #94a3b8;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
+		flex: 1;
 	}
 
-	.wrapper .order-detailed .empty-cart .empty-icon {
-		font-size: 12vw;
-		margin-bottom: 4vw;
+	.empty-icon {
+		font-size: 72px;
+		margin-bottom: 20px;
 		opacity: 0.5;
 	}
 
-	.wrapper .order-detailed .empty-cart .empty-text {
-		font-size: 3.5vw;
+	.empty-text {
+		font-size: 20px;
 	}
 
-	/****************** 配送费 ******************/
-	.wrapper .order-deliveryfee {
-		width: 100%;
-		height: 18vw;
-		padding: 3vw 4vw;
-		color: #666;
+	/* 配送费 */
+	.delivery-fee {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		font-size: 3.5vw;
-		background-color: #fff;
-		margin: 2vw;
-		border-radius: 12px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+		padding: 20px 0;
+		border-top: 1px solid #e2e8f0;
+		margin-top: auto;
 	}
 
-	.wrapper .order-deliveryfee .fee-label {
-		color: #666;
+	.fee-label {
+		font-size: 18px;
+		color: #64748b;
 	}
 
-	.wrapper .order-deliveryfee .fee-value {
-		color: #333;
+	.fee-value {
+		font-size: 18px;
+		font-weight: 500;
+		color: #1e293b;
+	}
+
+	/* 右侧摘要 */
+	.order-right {
+		flex: 3;
+		padding: 40px;
+		background: #f8fafc;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.summary-title {
+		font-size: 20px;
+		font-weight: 600;
+		color: #1e293b;
+		margin-bottom: 25px;
+		padding-bottom: 15px;
+		border-bottom: 1px solid #e2e8f0;
+	}
+
+	.summary-item {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 15px;
+	}
+
+	.summary-label {
+		font-size: 16px;
+		color: #64748b;
+	}
+
+	.summary-value {
+		font-size: 16px;
+		color: #1e293b;
 		font-weight: 500;
 	}
 
-	/****************** 底部合计 ******************/
-	.wrapper .total {
+	.summary-total {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 25px;
+		padding-top: 20px;
+		border-top: 1px solid #e2e8f0;
+		font-size: 20px;
+		font-weight: 600;
+		color: #1e293b;
+	}
+
+	.pay-button {
 		width: 100%;
-		height: 14vw;
-		position: fixed;
-		left: 0;
-		bottom: 0;
-		display: flex;
-		box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08); /* 顶部阴影，区分内容区 */
-	}
-
-	.wrapper .total .total-left {
-		flex: 2;
-		background-color: #505051;
-		color: #fff;
-		font-size: 4.5vw;
-		font-weight: 500;
-		user-select: none;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.wrapper .total .total-left .total-label {
-		opacity: 0.8;
-		margin-right: 1.5vw;
-	}
-
-	.wrapper .total .total-left .total-amount {
-		font-weight: 700;
-		font-size: 5vw;
-	}
-
-	/* 支付按钮：强化交互 */
-	.wrapper .total .total-right {
-		flex: 1;
-		background-color: #38CA73;
-		color: #fff;
-		font-size: 4.5vw;
-		font-weight: 500;
-		user-select: none;
+		background: #8faca5;
+		color: white;
+		border: none;
+		border-radius: 12px;
+		padding: 20px;
+		font-size: 18px;
+		font-weight: 600;
 		cursor: pointer;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		transition: all 0.2s; /* 过渡动画 */
+		margin-top: 30px;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 12px rgba(143, 172, 165, 0.3);
 	}
 
-	/* 支付按钮 hover 反馈 */
-	.wrapper .total .total-right:hover {
-		background-color: #2EAF63; /* 加深绿色 */
-		transform: scale(1.02); /* 轻微放大 */
+	.pay-button:hover {
+		background: #7a9c94;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 18px rgba(143, 172, 165, 0.4);
 	}
 
-	/* 支付按钮 active 反馈 */
-	.wrapper .total .total-right:active {
-		transform: scale(0.98); /* 点击收缩 */
+	/* 响应式设计 */
+	@media (max-width: 900px) {
+		.order-content {
+			flex-direction: column;
+		}
+
+		.order-left {
+			border-right: none;
+			border-bottom: 1px solid #e2e8f0;
+		}
+
+		.order-container {
+			margin: 20px auto;
+			min-height: auto;
+		}
+
+		.order-header {
+			padding: 15px 40px 15px 60px;
+		}
+
+		.back-button {
+			left: 15px;
+		}
 	}
-	/* ====== Desktop overrides（≥768px）====== */
-@media (min-width: 768px) {
-  /* 让内容在桌面看起来更“正常”的字号与间距 */
-  .wrapper {
-    max-width: 1100px;     /* 居中内容区 */
-    margin: 0 auto;
-    padding-bottom: 84px;  /* 预留底部条高度 */
-  }
-
-  /* 顶部导航：固定64px 高度，不再用 vw */
-  .wrapper header {
-    height: 64px;
-    font-size: 20px;
-    position: sticky;   /* 桌面用粘性吸顶更自然 */
-    top: 0;
-    left: 0;
-  }
-
-  /* 地址区改成白底卡片，和内容分离 */
-  .wrapper .order-info {
-    margin-top: 80px;                /* 避开 header */
-    background-color: #fff;
-    color: #333;
-    padding: 20px 24px;
-    border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,.06);
-    border: 1px solid #f0f0f0;
-  }
-
-  .wrapper .order-info h5 {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 8px;
-    opacity: 1;
-  }
-
-  .wrapper .order-info .order-info-address {
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid #eaeaea;
-  }
-
-  .wrapper .order-info .order-info-address .address-text {
-    width: auto;
-    max-width: calc(100% - 28px);
-    font-size: 18px;
-    color: #222;
-  }
-
-  .wrapper .order-info .order-info-address .address-icon {
-    font-size: 18px;
-    color: #999;
-  }
-
-  .wrapper .order-info .contact-info {
-    font-size: 14px;
-    margin-top: 6px;
-    color: #666;
-  }
-
-  .wrapper .order-info .debug-info {
-    font-size: 12px;
-    color: #9aa4af;
-    margin-top: 6px;
-    opacity: .9;
-  }
-
-  /* 商家名称条 */
-  .wrapper .business-name {
-    padding: 18px 0;
-    font-size: 20px;
-    color: #222;
-    border-bottom: 1px solid #eee;
-    background-color: transparent;
-    margin: 16px 0 12px;
-  }
-
-  /* 商品列表卡片化 */
-  .wrapper .order-detailed {
-    margin: 0;                    /* 去掉两侧 2vw */
-    border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,.06);
-    border: 1px solid #f0f0f0;
-  }
-
-  .wrapper .order-detailed .product-item {
-    height: auto;                 /* 高度自适应行高 */
-    padding: 16px 18px;
-    border-bottom: 1px solid #f5f5f5;
-  }
-
-  .wrapper .order-detailed .product-item .food-img {
-    width: 72px;
-    height: 72px;
-    border-radius: 8px;
-  }
-
-  .wrapper .order-detailed .product-item .product-name {
-    font-size: 16px;
-    margin-left: 14px;
-    max-width: 560px;
-    color: #333;
-  }
-
-  .wrapper .order-detailed .product-item .product-price {
-    font-size: 18px;
-  }
-
-  .wrapper .order-detailed .empty-cart {
-    padding: 80px 24px;
-  }
-
-  .wrapper .order-detailed .empty-cart .empty-icon {
-    font-size: 72px;
-  }
-
-  .wrapper .order-detailed .empty-cart .empty-text {
-    font-size: 16px;
-  }
-
-  /* 配送费区 */
-  .wrapper .order-deliveryfee {
-    height: auto;
-    padding: 14px 18px;
-    margin: 14px 0;
-    border-radius: 12px;
-    border: 1px solid #f0f0f0;
-  }
-  .wrapper .order-deliveryfee .fee-label { font-size: 15px; }
-  .wrapper .order-deliveryfee .fee-value { font-size: 16px; }
-
-  /* 底部合计条：固定 64px；字号适配桌面 */
-  .wrapper .total {
-    height: 64px;
-    box-shadow: 0 -6px 18px rgba(0,0,0,.06);
-  }
-  .wrapper .total .total-left {
-    font-size: 18px;
-  }
-  .wrapper .total .total-left .total-amount {
-    font-size: 20px;
-  }
-  .wrapper .total .total-right {
-    font-size: 18px;
-  }
-}
-
-/* ====== Large Desktop（≥1200px）进一步优化间距与排版 ====== */
-@media (min-width: 1200px) {
-  .wrapper { max-width: 1180px; }
-
-  .wrapper .order-info { padding: 22px 26px; }
-  .wrapper .order-detailed .product-item { padding: 18px 20px; }
-  .wrapper .order-detailed .product-item .food-img {
-    width: 80px; height: 80px;
-  }
-  .wrapper .order-detailed .product-item .product-name {
-    max-width: 640px;
-  }
-}
-
 </style>

@@ -1,256 +1,422 @@
 <template>
 	<div class="wrapper">
-		<!-- header部分 -->
-		<header>
-			<p>地址管理</p>
+		<!-- 头部 -->
+		<header class="header">
+			<div class="back-box" @click="$router.go(-1)">
+				<span class="back-symbol">&lt;</span>
+			</div>
+			<p class="header-title">地址管理</p>
+			<div class="header-right"></div>
 		</header>
 
-		<!-- 地址列表部分 -->
-		<div class="addresslist">
-			<li v-for="item in deliveryAddressArr" :key="item.id"> <!-- 键改为 id -->
-				<div class="addresslist-left" @click="setDeliveryAddress(item)">
-					<h3>{{item.contactName}}{{formatSex(item.contactSex)}} {{item.contactTel}}</h3>
-					<p>{{item.address}}</p>
+		<!-- 地址列表 -->
+		<div class="address-container">
+			<!-- 地址卡片：:class 完全手动输入，无任何特殊字符 -->
+			<div class="address-card" v-for="(item, index) in deliveryAddressArr" :key="item.id || index"
+				@mouseenter="item.hover = true" @mouseleave="item.hover = false"
+				:class="{ 'address-card--selected': isSelectedAddress(item.id) }">
+				<!-- 地址信息 -->
+				<div class="address-info" @click="setDeliveryAddress(item)">
+					<div class="contact-row">
+						<span class="contact-name">{{ item.contactName }}{{ formatSex(item.contactSex) }}</span>
+						<span class="contact-tel">{{ item.contactTel }}</span>
+					</div>
+					<div class="address-detail">
+						{{ item.province }} {{ item.city }} {{ item.district }} {{ item.address }}
+					</div>
+					<div class="default-tag" v-if="item.isDefault">默认地址</div>
 				</div>
-				<div class="addresslist-right">
-					<i class="fa fa-edit" @click="editUserAddress(item.id)"></i> <!-- 改为 id -->
-					<i class="fa fa-remove" @click="removeUserAddress(item.id)"></i> <!-- 改为 id -->
+
+				<!-- 操作按钮：:class 手动重写，无空格/特殊字符 -->
+				<div class="address-actions">
+					<button class="action-btn edit-btn" @click.stop="editUserAddress(item.id)"
+						:class="{ 'active': item.hover }">
+						<i class="fa fa-edit"></i>
+						<span class="btn-text">编辑</span>
+					</button>
+					<button class="action-btn delete-btn" @click.stop="removeUserAddress(item.id)"
+						:class="{ 'active': item.hover }">
+						<i class="fa fa-trash"></i>
+						<span class="btn-text">删除</span>
+					</button>
 				</div>
-			</li>
+			</div>
+
+			<!-- 空状态 -->
+			<div class="empty-tip" v-if="deliveryAddressArr.length === 0">
+				<div class="empty-content">
+					<i class="fa fa-map-marker-alt empty-icon"></i>
+					<p class="empty-title">暂无收货地址</p>
+					<p class="empty-desc">点击下方按钮添加您的第一个收货地址吧~</p>
+				</div>
+			</div>
 		</div>
 
-		<!-- 新增地址部分 -->
-		<div class="addbtn" @click="toAddUserAddress">
-			<i class="fa fa-plus-circle"></i>
-			<p>新增收货地址</p>
-		</div>
+		<!-- 新增按钮 -->
+		<button class="add-address-btn" @click="toAddUserAddress">
+			<i class="fa fa-plus"></i>
+			<span>新增收货地址</span>
+		</button>
 
-		<!-- 底部菜单部分 -->
-		<NavFooter></NavFooter>
+		<!-- 底部导航 -->
+		<NavFooter class="nav-footer"></NavFooter>
 	</div>
 </template>
 
 <script>
-	import NavFooter from '../components/NavFooter.vue';
+import NavFooter from '../components/NavFooter.vue';
 
-	export default {
-		name: 'UserAddress',
-		data() {
-			return {
-				businessId: this.$route.query.businessId,
-				user: {},
-				deliveryAddressArr: []
-			}
+export default {
+	name: 'UserAddress',
+	data() {
+		return {
+			businessId: this.$route.query.businessId,
+			user: {},
+			deliveryAddressArr: [],
+			selectedAddressId: ''
+		};
+	},
+	created() {
+		this.user = this.$getSessionStorage('user');
+		const selectedAddress = this.$getLocalStorage('selectedDeliveryAddress');
+		this.selectedAddressId = selectedAddress?.id || '';
+		this.listDeliveryAddressByUserId();
+	},
+	components: { NavFooter },
+	methods: {
+		formatSex(value) {
+			return value === 1 ? '（女士）' : '（先生）';
 		},
-		created() {
-			this.user = this.$getSessionStorage('user');
-			this.listDeliveryAddressByUserId();
+		isSelectedAddress(addressId) {
+			return this.selectedAddressId === addressId;
 		},
-		components: {
-			NavFooter
-		},
-		methods: {
-			formatSex(value) {
-				return value == 1 ? '女士' : '先生'; // 根据后端实体，0-男，1-女
-			},
-			listDeliveryAddressByUserId() {
-				// 获取当前用户的地址列表 GET /api/addresses
-				this.$axios.get('/api/addresses') // 使用GET请求
-					.then(response => {
-						console.log('地址接口完整响应:', response); // 调试用
-						// 根据你提供的实际响应结构，数据在 response.data.data 中，成功标志是 response.data.success
-						if (response.data && response.data.success === true && Array.isArray(response.data.data)) {
-							this.deliveryAddressArr = response.data.data;
-							console.log('成功获取地址列表:', this.deliveryAddressArr); // 调试用
-						} else {
-							console.error('返回数据格式错误或操作失败', response.data);
-							this.deliveryAddressArr = [];
-							// 可以根据 response.data.message 提示用户
-							// 例如：this.$message.error(response.data.message || '获取地址失败');
-						}
-					}).catch(error => {
-						console.error('获取地址列表失败:', error);
-						if (error.response) {
-							// 根据HTTP状态码处理不同错误
-							switch (error.response.status) {
-								case 404:
-									this.deliveryAddressArr = [];
-									// this.$message.info('暂无收货地址');
-									break;
-								case 401:
-									// this.$message.error('请重新登录');
-									// 可能需要跳转到登录页
-									break;
-								case 500:
-									// this.$message.error('服务器错误，请稍后重试');
-									break;
-								default:
-									// this.$message.error('获取地址失败，请重试');
-							}
-						} else {
-							// 网络错误或请求被取消等情况
-							// this.$message.error('网络连接失败，请检查网络');
-						}
-					});
-			},
-			setDeliveryAddress(deliveryAddress) {
-				// 把用户选择的默认送货地址存储到localStorage中
-				this.$setLocalStorage('selectedDeliveryAddress', deliveryAddress);
-				this.$router.push({
-					path: '/orders',
-					query: {
-						businessId: this.businessId
+		listDeliveryAddressByUserId() {
+			this.$axios.get('/api/addresses')
+				.then(res => {
+					if (res.data?.success && Array.isArray(res.data.data)) {
+						this.deliveryAddressArr = res.data.data.map(item => ({ ...item, hover: false }));
+					} else {
+						this.deliveryAddressArr = [];
+					}
+				})
+				.catch(err => {
+					this.deliveryAddressArr = [];
+					if (err.response?.status === 401) {
+						alert('请重新登录');
+						this.$router.push('/login');
 					}
 				});
-			},
-			toAddUserAddress() {
-				this.$router.push({
-					path: '/addUserAddress',
-					query: {
-						businessId: this.businessId
-					}
-				});
-			},
-			editUserAddress(addressId) {
-				this.$router.push({
-					path: '/editUserAddress', // 你的编辑页面路由
-					query: {
-						businessId: this.businessId,
-						addressId: addressId // 传递地址ID
-					}
-				});
-			},
-			removeUserAddress(addressId) {
-				if (!confirm('确认要删除此送货地址吗？')) {
-					return;
-				}
-				// 删除地址 DELETE /api/addresses/{id}
-				this.$axios.delete(`/api/addresses/${addressId}`)
-					.then(response => {
-						// 根据你提供的实际响应结构，成功标志是 response.data.success
-						if (response.data && response.data.success === true) {
-
-							// *** 核心修改：直接从前端的地址数组中移除已删除的项 ***
-							this.deliveryAddressArr = this.deliveryAddressArr.filter(item => item.id !== addressId);
-
-							// 从本地存储中移除已删除的地址（如果是当前选中的）
-							let selectedAddress = this.$getLocalStorage('selectedDeliveryAddress');
-							if (selectedAddress && selectedAddress.id === addressId) {
-								this.$removeLocalStorage('selectedDeliveryAddress');
-							}
-
-							// 可以在这里给出成功提示
-							// this.$message.success('地址删除成功');
-						} else {
-							console.error('删除失败，服务器返回错误:', response.data);
-							// this.$message.error('删除地址失败！' + (response.data.message || ''));
+		},
+		setDeliveryAddress(deliveryAddress) {
+			this.$setLocalStorage('selectedDeliveryAddress', deliveryAddress);
+			this.selectedAddressId = deliveryAddress.id;
+			this.$router.push({
+				path: '/orders',
+				query: { businessId: this.businessId, address: JSON.stringify(deliveryAddress) }
+			});
+		},
+		toAddUserAddress() {
+			this.$router.push({ path: '/addUserAddress', query: { businessId: this.businessId } });
+		},
+		editUserAddress(addressId) {
+			this.$router.push({
+				path: '/editUserAddress',
+				query: { businessId: this.businessId, addressId: addressId }
+			});
+		},
+		removeUserAddress(addressId) {
+			if (!confirm('确认删除？')) return;
+			this.$axios.delete(`/api/addresses/${addressId}`)
+				.then(res => {
+					if (res.data?.success) {
+						this.deliveryAddressArr = this.deliveryAddressArr.filter(item => item.id !== addressId);
+						if (this.selectedAddressId === addressId) {
+							this.selectedAddressId = '';
+							this.$removeLocalStorage('selectedDeliveryAddress');
 						}
-					}).catch(error => {
-						console.error('删除地址失败:', error);
-						if (error.response) {
-							switch (error.response.status) {
-								case 404:
-									// this.$message.error('地址不存在');
-									break;
-								case 401:
-									// this.$message.error('请重新登录');
-									break;
-								default:
-									// this.$message.error('删除地址失败，请重试');
-							}
-						} else {
-							// this.$message.error('网络连接失败，请检查网络');
-						}
-					});
-			}
+						alert('删除成功');
+					} else {
+						alert('删除失败');
+					}
+				})
+				.catch(() => {
+					alert('删除失败，请重试');
+				});
 		}
 	}
+};
 </script>
 
 <style scoped>
-	/*************** 总容器 ***************/
-	.wrapper {
-		width: 100%;
-		height: 100%;
-		background-color: #F5F5F5;
+.wrapper {
+	width: 100%;
+	min-height: 100vh;
+	background-color: #fcfcfa;
+	padding-bottom: 80px;
+	box-sizing: border-box;
+}
+
+.header {
+	width: 100%;
+	height: 60px;
+	background: #fff;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	padding: 0 24px;
+	box-sizing: border-box;
+}
+
+.back-box {
+	width: 40px;
+	height: 40px;
+	border-radius: 8px;
+	background: #f5f5f2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.back-box:hover {
+	background: #ebebe6;
+}
+
+.back-symbol {
+	font-size: 20px;
+	color: #5d5a56;
+	font-weight: 500;
+}
+
+.header-title {
+	flex: 1;
+	text-align: center;
+	font-size: 18px;
+	font-weight: 500;
+	color: #33312e;
+}
+
+.header-right {
+	width: 40px;
+}
+
+.address-container {
+	max-width: 1200px;
+	width: 100%;
+	margin: 80px auto 24px;
+	padding: 0 24px;
+	box-sizing: border-box;
+}
+
+.address-card {
+	width: 100%;
+	background: #fff;
+	border-radius: 12px;
+	padding: 24px;
+	margin-bottom: 16px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	transition: all 0.3s;
+	border: 2px solid transparent;
+	box-sizing: border-box;
+	cursor: pointer;
+}
+
+.address-card:hover {
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+	transform: translateY(-2px);
+	border-color: #f0efe9;
+}
+
+.address-card--selected {
+	border-color: #8faca5 !important;
+	box-shadow: 0 4px 16px rgba(143, 172, 165, 0.15);
+}
+
+.address-info {
+	flex: 1;
+	margin-right: 24px;
+}
+
+.contact-row {
+	display: flex;
+	align-items: center;
+	margin-bottom: 8px;
+}
+
+.contact-name {
+	font-size: 16px;
+	font-weight: 500;
+	color: #33312e;
+	margin-right: 24px;
+}
+
+.contact-tel {
+	font-size: 14px;
+	color: #7d7a76;
+}
+
+.address-detail {
+	font-size: 14px;
+	color: #7d7a76;
+	line-height: 1.6;
+	margin-bottom: 8px;
+	word-break: break-all;
+}
+
+.default-tag {
+	display: inline-block;
+	background: #f5f5f2;
+	color: #7d7a76;
+	font-size: 12px;
+	padding: 2px 8px;
+	border-radius: 4px;
+}
+
+.address-actions {
+	display: flex;
+	gap: 16px;
+}
+
+.action-btn {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	font-size: 14px;
+	padding: 8px 12px;
+	border-radius: 6px;
+	transition: all 0.2s;
+}
+
+.edit-btn {
+	color: #8faca5;
+}
+
+.edit-btn.active,
+.edit-btn:hover {
+	color: #789a94;
+	background: #f8f5ea;
+}
+
+.delete-btn {
+	color: #a0522d;
+}
+
+.delete-btn.active,
+.delete-btn:hover {
+	color: #8b4513;
+	background: #fef6f2;
+}
+
+.btn-text {
+	white-space: nowrap;
+}
+
+.add-address-btn {
+	max-width: 1200px;
+	width: 100%;
+	height: 56px;
+	margin: 0 auto 32px;
+	background: #8faca5;
+	color: #fff;
+	border: none;
+	border-radius: 12px;
+	font-size: 16px;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	cursor: pointer;
+	transition: all 0.2s;
+	padding: 0 24px;
+	box-sizing: border-box;
+}
+
+.add-address-btn:hover {
+	background: #789a94;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(143, 172, 165, 0.2);
+}
+
+.empty-tip {
+	width: 100%;
+	height: 300px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 40px;
+}
+
+.empty-content {
+	text-align: center;
+}
+
+.empty-icon {
+	font-size: 80px;
+	color: #e0dedb;
+	margin-bottom: 24px;
+	animation: float 2.5s ease-in-out infinite;
+}
+
+.empty-title {
+	font-size: 18px;
+	color: #7d7a76;
+	margin-bottom: 12px;
+}
+
+.empty-desc {
+	font-size: 14px;
+	color: #a09c97;
+}
+
+@keyframes float {
+
+	0%,
+	100% {
+		transform: translateY(0);
 	}
 
-	/*************** header ***************/
-	.wrapper header {
-		width: 100%;
-		height: 12vw;
-		background-color: #0097FF;
-		display: flex;
-		justify-content: space-around;
-		align-items: center;
-		color: #fff;
-		font-size: 4.8vw;
-		position: fixed;
-		left: 0;
-		top: 0;
-		z-index: 1000;
+	50% {
+		transform: translateY(-12px);
+	}
+}
+
+@media (max-width:768px) {
+	.address-container {
+		padding: 0 16px;
 	}
 
-	/*************** addresslist ***************/
-	.wrapper .addresslist {
-		width: 100%;
-		margin-top: 12vw;
-		background-color: #fff;
+	.address-card {
+		padding: 16px;
+		border-width: 1.5px;
 	}
 
-	.wrapper .addresslist li {
-		width: 100%;
-		box-sizing: border-box;
-		border-bottom: solid 1px #DDD;
-		padding: 3vw;
-		display: flex;
+	.contact-name {
+		margin-right: 16px;
 	}
 
-	.wrapper .addresslist li .addresslist-left {
-		flex: 5;
-		user-select: none;
-		cursor: pointer;
+	.btn-text {
+		display: none;
 	}
 
-	.wrapper .addresslist li .addresslist-left h3 {
-		font-size: 4.6vw;
-		font-weight: 300;
-		color: #666;
+	.address-actions {
+		gap: 8px;
 	}
 
-	.wrapper .addresslist li .addresslist-left p {
-		font-size: 4vw;
-		color: #666;
+	.add-address-btn {
+		height: 48px;
+		font-size: 14px;
 	}
-
-	.wrapper .addresslist li .addresslist-right {
-		flex: 1;
-		font-size: 5.6vw;
-		color: #999;
-		cursor: pointer;
-		display: flex;
-		justify-content: space-around;
-		align-items: center;
-	}
-
-	/*************** 新增地址部分 ***************/
-	.wrapper .addbtn {
-		width: 100%;
-		height: 14vw;
-		border-top: solid 1px #DDD;
-		border-bottom: solid 1px #DDD;
-		background-color: #fff;
-		margin-top: 4vw;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		font-size: 4.5vw;
-		color: #0097FF;
-		user-select: none;
-		cursor: pointer;
-	}
-
-	.wrapper .addbtn p {
-		margin-left: 2vw;
-	}
+}
 </style>
