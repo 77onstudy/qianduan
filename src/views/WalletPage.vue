@@ -16,7 +16,7 @@
 				<div class="balance-box">
 					<div class="balance-label">当前余额（元）</div>
 					<!-- 用计算属性，避免 balance 为 null / 字符串时报错 -->
-					<div class="balance-value">{{ formattedBalance }}</div>
+					<div class="balance-value">{{ this.balance}}</div>
 				</div>
 
 				<!-- 按钮区：四个操作按钮 -->
@@ -87,8 +87,8 @@ export default {
 			this.$axios
 				.get('/api/wallet')
 				.then(res => {
-					if (res && res.data && typeof res.data.balance !== 'undefined') {
-						this.balance = res.data.balance;
+					if (res ) {
+						this.balance = res.data.data.balance;
 					} else {
 						console.warn('钱包接口返回不包含 balance 字段：', res.data);
 					}
