@@ -120,6 +120,17 @@ const routes = [
     name: 'FavouriteBusinesses',
     component: () => import('../views/FavouriteBusinesses.vue')
   },
+  {
+    path: '/wallet',
+    name: 'WalletPage',
+    component: () => import('@/views/WalletPage.vue')
+  },
+  {
+    path: '/trade-stream',
+    name: 'TradeStreamPage',
+    component: () => import('@/views/TradeStreamPage.vue')
+  }
+
 ]
 
 const router = createRouter({

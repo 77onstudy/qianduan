@@ -44,26 +44,33 @@
 					<template v-if="isEditable">
 						<button class="btn primary-btn" @click="save">保存修改</button>
 					</template>
-
-					<!-- 非编辑态：4个按钮均匀排列（核心优化） -->
 					<template v-else>
 						<button class="btn ghost-btn" @click="enableEditing">
 							<i class="fa fa-pencil icon"></i>
 							<span class="text">修改</span>
 						</button>
+
 						<button class="btn ghost-btn" @click="goToFavourite">
 							<i class="fa fa-star icon"></i>
 							<span class="text">我的收藏</span>
 						</button>
+
 						<button class="btn ghost-btn" @click="goToAddress">
 							<i class="fa fa-map-marker icon"></i>
 							<span class="text">我的地址</span>
 						</button>
+
+						<button class="btn ghost-btn" @click="goToWallet">
+							<i class="fa fa-credit-card icon"></i>
+							<span class="text">我的钱包</span>
+						</button>
+
 						<button class="btn ghost-btn" @click="logout">
 							<i class="fa fa-sign-out icon"></i>
 							<span class="text">退出登录</span>
 						</button>
 					</template>
+
 				</div>
 			</div>
 		</div>
@@ -121,6 +128,11 @@ export default {
 					alert('请求失败，请检查网络或重试');
 				});
 		},
+		goToWallet() {
+			this.$axios.post('/api/wallet');
+			this.$router.push({ name: 'WalletPage' });
+		},
+
 		goToAddress() {
 			this.$router.push({ name: 'UserAddress' });
 		},
