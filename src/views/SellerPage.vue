@@ -52,9 +52,17 @@
       </div>
 
       <div class="button-group">
-        <button type="submit" class="primary">提交</button>
-        <button type="button" class="secondary" @click="toFood">食品管理</button>
-      </div>
+      <button type="submit" class="primary">提交</button>
+
+      <button type="button" class="secondary" @click="toFood">
+        食品管理
+      </button>
+
+      <button type="button" class="wallet-btn" @click="toWallet">
+        钱包管理
+      </button>
+    </div>
+
     </form>
 
     <div v-else class="loading">正在加载...</div>
@@ -238,7 +246,12 @@ export default {
       this.$router.push({
 					path: '/goodsManage'
 				});
-    }
+    },
+		toWallet() {
+			this.$axios.post('/api/wallet');
+			this.$router.push({ name: 'WalletPage' });
+		},
+
   },
   mounted() {
     this.init();

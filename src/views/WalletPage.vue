@@ -15,13 +15,12 @@
 				<!-- 余额显示 -->
 				<div class="balance-box">
 					<div class="balance-label">当前余额（元）</div>
-					<!-- 用计算属性，避免 balance 为 null / 字符串时报错 -->
-					<div class="balance-value">{{ this.balance}}</div>
+					<div class="balance-value">{{ balance }}</div>
 				</div>
 
-				<!-- 按钮区：四个操作按钮 -->
+				<!-- 按钮区 -->
 				<div class="btn-group">
-					<!-- 充值：输入框 + 按钮 -->
+					<!-- 充值 -->
 					<div class="recharge-row">
 						<input
 							type="number"
@@ -34,6 +33,7 @@
 						</button>
 					</div>
 
+					<!-- 提现 -->
 					<div class="recharge-row">
 						<input
 							type="number"
@@ -45,52 +45,46 @@
 							提现
 						</button>
 					</div>
+
+					<!-- 查询流水 -->
 					<button class="wallet-btn" @click="handleViewFlow">
-						<span>查看流水</span>
+						查看流水
 					</button>
+
+					<!-- 借贷 -->
 					<button class="wallet-btn" @click="handleLoan">
-						<span>借贷</span>
+						借贷
+					</button>
+
+					<!-- ⭐ 冻结资金 -->
+					<button class="wallet-btn" @click="handleFrozen">
+						冻结资金
 					</button>
 				</div>
 			</div>
 		</div>
-
-		<!-- <NavFooter /> -->
 	</div>
 </template>
 
 <script>
-// import NavFooter from '@/components/NavFooter.vue';
-
 export default {
 	name: 'WalletPage',
-	// components: { NavFooter },
+
 	data() {
 		return {
 			balance: 0.0,
 			rechargeAmount: '',
-			withdrawAmount: ""
+			withdrawAmount: ''
 		};
 	},
-	computed: {
-		// 避免 balance 不是数字时报错：统一转成数字再 toFixed
-		formattedBalance() {
-			const n = Number(this.balance);
-			if (Number.isNaN(n)) {
-				return '0.00';
-			}
-			return n.toFixed(2);
-		}
-	},
+
 	methods: {
 		getWallet() {
 			this.$axios
 				.get('/api/wallet')
 				.then(res => {
-					if (res ) {
+					if (res) {
 						this.balance = res.data.data.balance;
-					} else {
-						console.warn('钱包接口返回不包含 balance 字段：', res.data);
 					}
 				})
 				.catch(err => {
@@ -100,58 +94,57 @@ export default {
 		},
 
 		handleRecharge() {
-			if (!this.rechargeAmount || this.rechargeAmount <= 0||this.rechargeAmount%1) {
-				alert("请输入有效的充值金额");
+			if (!this.rechargeAmount || this.rechargeAmount <= 0 || this.rechargeAmount % 1) {
+				alert('请输入有效的充值金额');
 				return;
 			}
 
-			this.$axios.patch('/api/wallet/recharge', {
-				money: this.rechargeAmount  
-			})
-			.then(res => {
-				if(res){
-				alert("充值成功");}
-
-				this.getWallet();
-
-				this.rechargeAmount = "";
-			})
-			.catch(err => {
-				console.error(err);
-				alert("充值失败");
-			});
-		},
-		handleWithdraw() {
-			if (!this.withdrawAmount || this.withdrawAmount <= 0 || this.withdrawAmount % 1) {
-				alert("请输入有效的提现金额");
-				return;
-			}
-
-			this.$axios.patch('/api/wallet/withdraw', {
-				money: this.withdrawAmount
-			})
+			this.$axios
+				.patch('/api/wallet/recharge', { money: this.rechargeAmount })
 				.then(res => {
-					
-					alert("提现成功"+res.data.data.money+"元");
-
-					this.getWallet();       
-					this.withdrawAmount = ""; 
+					if(res){
+					alert('充值成功');}
+					this.getWallet();
+					this.rechargeAmount = '';
 				})
 				.catch(err => {
 					console.error(err);
-					alert("提现失败");
+					alert('充值失败');
 				});
 		},
-		// 查看流水
+
+		handleWithdraw() {
+			if (!this.withdrawAmount || this.withdrawAmount <= 0 || this.withdrawAmount % 1) {
+				alert('请输入有效的提现金额');
+				return;
+			}
+
+			this.$axios
+				.patch('/api/wallet/withdraw', { money: this.withdrawAmount })
+				.then(res => {
+					alert('提现成功' + res.data.data.money + '元');
+					this.getWallet();
+					this.withdrawAmount = '';
+				})
+				.catch(err => {
+					console.error(err);
+					alert('提现失败');
+				});
+		},
+
 		handleViewFlow() {
 			this.$router.push({ name: 'TradeStreamPage' });
 		},
-		// 借贷
+
 		handleLoan() {
-			// TODO: 在这里实现借贷逻辑
-			console.log('点击借贷');
+			this.$router.push({ name: 'LoanPage' });
+		},
+
+		handleFrozen() {
+			this.$router.push({ name: 'FrozenPage' });
 		}
 	},
+
 	mounted() {
 		this.getWallet();
 	}
@@ -168,7 +161,6 @@ export default {
 	font-family: 'Segoe UI', 'Inter', sans-serif;
 }
 
-/* 头部 */
 .header {
 	width: 100%;
 	height: 80px;
@@ -219,7 +211,6 @@ export default {
 	width: 44px;
 }
 
-/* 内容区 */
 .content {
 	width: 100%;
 	max-width: 880px;
@@ -228,7 +219,6 @@ export default {
 	box-sizing: border-box;
 }
 
-/* 钱包卡片 */
 .wallet-card {
 	width: 100%;
 	background-color: #ffffff;
@@ -238,7 +228,6 @@ export default {
 	box-sizing: border-box;
 }
 
-/* 余额显示 */
 .balance-box {
 	background: linear-gradient(135deg, #8faca5, #6f8e88);
 	border-radius: 16px;
@@ -258,7 +247,6 @@ export default {
 	font-weight: 600;
 }
 
-/* 按钮组 */
 .btn-group {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
@@ -266,14 +254,12 @@ export default {
 	margin-top: 10px;
 }
 
-/* 充值行：占两列，里面再用 flex 布局 */
 .recharge-row {
 	display: flex;
 	gap: 12px;
 	grid-column: span 2;
 }
 
-/* 输入框 */
 .recharge-input {
 	flex: 1;
 	height: 54px;
@@ -286,14 +272,6 @@ export default {
 	box-sizing: border-box;
 }
 
-.recharge-input:focus {
-	outline: none;
-	border-color: #8faca5;
-	box-shadow: 0 0 0 3px rgba(143, 172, 165, 0.2);
-	background-color: #ffffff;
-}
-
-/* 按钮 */
 .wallet-btn {
 	height: 54px;
 	border-radius: 12px;
@@ -317,38 +295,7 @@ export default {
 	transform: translateY(-1px);
 }
 
-/* 充值按钮微调 */
 .recharge-btn {
 	min-width: 100px;
-}
-
-/* 小屏适配 */
-@media (max-width: 767px) {
-	.header {
-		height: 70px;
-	}
-
-	.content {
-		margin: 90px auto 30px;
-		padding: 0 16px;
-	}
-
-	.wallet-card {
-		padding: 22px 18px 26px;
-	}
-
-	.balance-value {
-		font-size: 26px;
-	}
-
-	.wallet-btn {
-		height: 50px;
-		font-size: 15px;
-	}
-
-	.recharge-input {
-		height: 50px;
-		font-size: 15px;
-	}
 }
 </style>

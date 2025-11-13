@@ -12,38 +12,51 @@
       <h3>订单信息：</h3>
       <div class="order-info">
         <p>
-          {{orders.business.businessName}}
+          {{ orders.business.businessName }}
           <i class="fa fa-angle-down" @click="detailetShow"></i>
         </p>
-        <p>&#165;{{orders.orderTotal}}</p>
+        <p>&#165;{{ orders.orderTotal }}</p>
       </div>
 
       <div class="order-detailet" v-show="isShowDetailet">
         <li v-for="(item, index) in orders.list" :key="item.food.foodId || index">
-          <p>{{item.food.foodName}} x {{item.quantity}}</p>
-          <p>&#165;{{(item.food.foodPrice * item.quantity).toFixed(2)}}</p>
+          <p>{{ item.food.foodName }} x {{ item.quantity }}</p>
+          <p>&#165;{{ (item.food.foodPrice * item.quantity).toFixed(2) }}</p>
         </li>
         <li>
           <p>配送费</p>
-          <p>&#165;{{orders.business.deliveryPrice}}</p>
+          <p>&#165;{{ orders.business.deliveryPrice }}</p>
         </li>
       </div>
 
       <div class="payment-section">
         <h3>支付方式:</h3>
         <div class="payment-type">
-          <!-- 选中时添加active类，保留方形圆弧+浮动+边框包围效果 -->
-          <li 
-            @click="selectPayment('alipay')" 
+          <!-- 支付宝 -->
+          <li
+            @click="selectPayment('alipay')"
             :class="{ active: paymentType === 'alipay' }"
           >
-            <img src="../assets/alipay.png" alt="支付宝">
+            <img src="../assets/alipay.png" alt="支付宝" />
           </li>
-          <li 
-            @click="selectPayment('wechat')" 
+
+          <!-- 微信 -->
+          <li
+            @click="selectPayment('wechat')"
             :class="{ active: paymentType === 'wechat' }"
           >
-            <img src="../assets/wechat.png" alt="微信支付">
+            <img src="../assets/wechat.png" alt="微信支付" />
+          </li>
+
+          <!-- 电子钱包支付 -->
+          <li
+            @click="selectPayment('wallet')"
+            :class="{ active: paymentType === 'wallet' }"
+          >
+            <div class="wallet-pay-text">
+              <span class="wallet-title">电子钱包支付</span>
+              <span class="wallet-desc">使用钱包余额付款</span>
+            </div>
           </li>
         </div>
       </div>
@@ -63,77 +76,98 @@ export default {
       orderId: this.$route.query.orderId,
       orders: { business: {}, list: [] },
       isShowDetailet: false,
-      paymentType: 'wechat'
+      paymentType: 'wechat' // 默认微信
     }
   },
   created() {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem('token')
     if (!token) {
-      alert('请先登录！');
-      this.$router.push('/login');
-      return;
+      alert('请先登录！')
+      this.$router.push('/login')
+      return
     }
-    const config = { headers: { Authorization: `Bearer ${token}` } };
+    const config = { headers: { Authorization: `Bearer ${token}` } }
 
     // 获取订单详情：GET /api/orders/{id}
-    this.$axios.get(`/api/orders/${this.orderId}`, config)
+    this.$axios
+      .get(`/api/orders/${this.orderId}`, config)
       .then(res => {
-        const r = res.data || {};
+        const r = res.data || {}
         if (r.success) {
-          // 字段兼容：把后端的 orderDetails 映射到前端沿用的 list
-          const data = r.data || {};
-          data.list = data.orderDetails || [];
+          const data = r.data || {}
+          // 把后端的 orderDetails 映射到前端沿用的 list
+          data.list = data.orderDetails || []
           // 兼容 orderId
-          data.orderId = data.id;
-          this.orders = data;
+          data.orderId = data.id
+          this.orders = data
         } else {
-          alert(r.message || '获取订单失败');
+          alert(r.message || '获取订单失败')
         }
       })
       .catch(err => {
-        console.error(err);
-        alert('网络错误，无法获取订单信息');
-      });
+        console.error(err)
+        alert('网络错误，无法获取订单信息')
+      })
   },
   mounted() {
-    history.pushState(null, null, document.URL);
-    window.onpopstate = () => this.$router.push({ path: '/index' });
+    history.pushState(null, null, document.URL)
+    window.onpopstate = () => this.$router.push({ path: '/index' })
   },
   unmounted() {
-    window.onpopstate = null;
+    window.onpopstate = null
   },
   methods: {
     detailetShow() {
-      this.isShowDetailet = !this.isShowDetailet;
+      this.isShowDetailet = !this.isShowDetailet
     },
     selectPayment(type) {
-      this.paymentType = type;
+      this.paymentType = type
     },
     confirmPayment() {
-      const token = sessionStorage.getItem('token');
+      const token = sessionStorage.getItem('token')
       if (!token) {
-        alert('请先登录！');
-        this.$router.push('/login');
-        return;
+        alert('请先登录！')
+        this.$router.push('/login')
+        return
       }
-      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const config = { headers: { Authorization: `Bearer ${token}` } }
 
-      // 支付订单：PATCH /api/orders/pay/{id}
-      this.$axios.patch(`/api/orders/pay/${this.orderId}`, null, config)
-        .then(res => {
-          const r = res.data || {};
-          if (r.success) {
-            this.$router.push('/orderList');
-          } else {
-            alert(r.message || '支付失败，请重试！');
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          alert('支付请求出错，请检查网络');
-        });
+      // 电子钱包支付：调用 /api/wallet/pay/{id}
+      if (this.paymentType === 'wallet') {
+        this.$axios
+          .post(`/api/wallet/pay/${this.orderId}`, null, config)
+          .then(res => {
+            const r = res.data || {}
+            if (r.success) {
+              alert(r.message || '钱包支付成功')
+              this.$router.push('/orderList')
+            } else {
+              alert(r.message || '钱包支付失败，请重试！')
+            }
+          })
+          .catch(err => {
+            console.error(err)
+            alert('钱包支付请求出错，请检查网络')
+          })
+      } else {
+        // 其它方式仍走原来的订单支付接口
+        this.$axios
+          .patch(`/api/orders/pay/${this.orderId}`, null, config)
+          .then(res => {
+            const r = res.data || {}
+            if (r.success) {
+              this.$router.push('/orderList')
+            } else {
+              alert(r.message || '支付失败，请重试！')
+            }
+          })
+          .catch(err => {
+            console.error(err)
+            alert('支付请求出错，请检查网络')
+          })
+      }
     }
-  },
+  }
 }
 </script>
 
@@ -284,7 +318,7 @@ h3 {
   font-weight: 500;
 }
 
-/* ===== 支付方式（核心修改：恢复四角圆弧方形） ===== */
+/* ===== 支付方式 ===== */
 .payment-section {
   background: white;
   border-radius: 16px;
@@ -308,8 +342,8 @@ h3 {
   justify-content: space-between;
   padding: 18px 20px;
   background: #f8fafc;
-  border-radius: 12px; /* 恢复四角圆弧，与原设计一致 */
-  border: 2px solid transparent; /* 透明边框，选中时显示 */
+  border-radius: 12px;
+  border: 2px solid transparent;
   cursor: pointer;
   transition: all 0.3s ease;
   list-style: none;
@@ -323,15 +357,34 @@ h3 {
 
 /* 选中状态：向上浮动+彩色边框包围 */
 .payment-type li.active {
-  transform: translateY(-6px); /* 向上浮动，视觉更轻盈 */
-  border-color: #8faca5; /* 圆圈色边框（方形外框） */
-  box-shadow: 0 8px 16px rgba(143, 172, 165, 0.2); /* 强化浮动阴影 */
-  background: white; /* 选中时背景变白，突出边框 */
+  transform: translateY(-6px);
+  border-color: #8faca5;
+  box-shadow: 0 8px 16px rgba(143, 172, 165, 0.2);
+  background: white;
 }
 
 .payment-type li img {
   height: 45px;
   object-fit: contain;
+}
+
+/* 电子钱包支付文字块 */
+.wallet-pay-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.wallet-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.wallet-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 4px;
 }
 
 /* ===== 支付按钮 ===== */
@@ -359,52 +412,52 @@ h3 {
   box-shadow: 0 6px 18px rgba(143, 172, 165, 0.4);
 }
 
-/* ===== 响应式设计（同步适配方形样式） ===== */
+/* ===== 响应式设计 ===== */
 @media (min-width: 768px) {
   .content {
     padding: 30px;
   }
-  
+
   header {
     height: 70px;
     font-size: 22px;
   }
-  
+
   .back-button {
     width: 45px;
     height: 45px;
   }
-  
+
   h3 {
     font-size: 20px;
     margin: 30px 0 20px;
   }
-  
+
   .order-info {
     padding: 25px;
   }
-  
+
   .order-info p:first-child {
     font-size: 20px;
   }
-  
+
   .order-info p:last-child {
     font-size: 22px;
   }
-  
+
   .order-detailet {
     padding: 25px;
   }
-  
+
   .payment-section {
     padding: 25px;
   }
-  
+
   .payment-type {
     flex-direction: row;
     gap: 20px;
   }
-  
+
   .payment-type li {
     flex: 1;
     flex-direction: column;
@@ -412,15 +465,19 @@ h3 {
     padding: 25px 20px;
     text-align: center;
   }
-  
+
   .payment-type li img {
     height: 55px;
   }
-  
+
+  .wallet-pay-text {
+    align-items: center;
+  }
+
   .payment-button {
     padding: 30px;
   }
-  
+
   .payment-button button {
     height: 55px;
     font-size: 20px;

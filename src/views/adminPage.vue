@@ -6,7 +6,10 @@
         <button @click="loadBusinesses" :disabled="loading">
           {{ loading ? '刷新中...' : '刷新列表' }}
         </button>
+
+        <button class="ghost" @click="toStoredValue">储值活动管理</button>
       </div>
+
     </header>
 
     <!-- 新建店铺 -->
@@ -391,6 +394,10 @@ export default {
       }
     }
   },
+  toStoredValue() {
+  this.$router.push({ name: 'StoredValueManagePage' });
+  },
+
 
   mounted() {
     this.loadBusinesses();

@@ -129,7 +129,24 @@ const routes = [
     path: '/trade-stream',
     name: 'TradeStreamPage',
     component: () => import('@/views/TradeStreamPage.vue')
+  },
+  {
+    path: '/loan',
+    name: 'LoanPage',
+    component: () => import('@/views/LoanPage.vue')
+  },
+  {
+    path: '/wallet/frozen',
+    name: 'FrozenPage',
+    component: () => import('@/views/FrozenPage.vue')
+  },
+  {
+    path: '/admin/stored-value',
+    name: 'StoredValueManagePage',
+    component: () => import('@/views/StoredValueManagePage.vue')
   }
+  
+  
 
 ]
 
