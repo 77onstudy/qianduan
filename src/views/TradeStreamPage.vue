@@ -95,14 +95,15 @@ export default {
 					this.loading = false;
 
 					// 预期结构：res.data.data.WalletTrascation
-					const root = res && res.data ? res.data : null;
+					const root = res.data;
+
 
 					if (!root || !root.success) {
 						this.error = root && root.message ? root.message : '查询失败';
 						return;
 					}
 
-					const w = root.data && root.data.WalletTrascation;
+					const w = root.data;
 
 					// 如果后端给的是单个对象，就包成数组
 					if (w) {

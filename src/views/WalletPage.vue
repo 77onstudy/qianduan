@@ -132,7 +132,7 @@ export default {
 			})
 				.then(res => {
 					
-					alert("提现成功"+res.data.money+"元");
+					alert("提现成功"+res.data.data.money+"元");
 
 					this.getWallet();       
 					this.withdrawAmount = ""; 
