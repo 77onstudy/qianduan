@@ -32,8 +32,8 @@
 							<div
 								class="stream-amount"
 								:class="{
-									income: isIncome(item.transactionType),
-									expense: !isIncome(item.transactionType)
+									income: isIncome(item.symbol),
+									expense: !isIncome(item.symbol)
 								}"
 							>
 								{{ formatAmount(item.amount, item.transactionType) }}
@@ -130,22 +130,20 @@ export default {
 		},
 
 		isIncome(type) {
-			return type === 0 || type === 3;
+			return 2-type;
 		},
 
 		// 类型中文说明
 		formatType(type) {
 			switch (type) {
-				case 0:
-					return '充值';
 				case 1:
-					return '消费支付';
+					return '充值';
 				case 2:
 					return '提现';
 				case 3:
-					return '借贷';
+					return '钱包支付';
 				default:
-					return '其他';
+					return '非钱包支付';
 			}
 		},
 
