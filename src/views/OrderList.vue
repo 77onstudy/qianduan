@@ -198,22 +198,14 @@ export default {
     // 确认收货（订单状态为 1）
     confirmReceive(order) {
       // 根据你的说明：id 是 orderDetails 里的 id
-      const detail =
-        Array.isArray(order.list) && order.list.length > 0
-          ? order.list[0]
-          : null;
-
-      if (!detail || !detail.id) {
-        alert('未找到订单明细ID，无法确认收货');
-        return;
-      }
+      const detail =order.id
 
       const token = sessionStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
       // 注意：后端接口写的是 comfirm（你给的是这个拼写）
       this.$axios
-        .post(`/api/orders/comfirm/${detail.id}`, null, { headers })
+        .patch(`/api/orders/confirm/${detail}`, null, { headers })
         .then(res => {
           // 根据你后端的返回习惯，可以简单判断 success
           if (res?.data?.success === false) {
