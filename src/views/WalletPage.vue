@@ -137,6 +137,7 @@ export default {
 		},
 
 		handleLoan() {
+			this.$axios.post('/api/walletloan/vip/create')
 			this.$router.push({ name: 'LoanPage' });
 		},
 
