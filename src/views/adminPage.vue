@@ -388,12 +388,13 @@ export default {
           e?.message ||
           '删除失败';
       }
-    }
+    },
+	toStoredValue() {
+     console.log(11)
+	this.$router.push({ name: 'StoredValueManagePage' });
+	},
   },
-  toStoredValue() {
-   console.log(11)
-  this.$router.push({ name: 'StoredValueManagePage' });
-  },
+
 
 
   mounted() {

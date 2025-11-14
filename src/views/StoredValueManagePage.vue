@@ -21,7 +21,7 @@
 
 			<div class="form-grid">
 				<label>
-					订单限制时间（limitTime）
+					订单限制时间
 					<input
 						type="number"
 						v-model.number="form.limitTime"
@@ -30,7 +30,7 @@
 				</label>
 
 				<label>
-					VIP 门槛金额（vip）
+					VIP 门槛金额
 					<input
 						type="number"
 						step="0.01"
@@ -40,7 +40,7 @@
 				</label>
 
 				<label>
-					VIP 透支额度上限（vipOverdraftLimit）
+					VIP 透支额度上限
 					<input
 						type="number"
 						step="0.01"
@@ -50,7 +50,7 @@
 				</label>
 
 				<label>
-					充值赠送金额（rechargeReward）
+					充值赠送金额
 					<input
 						type="number"
 						step="0.01"
@@ -60,7 +60,7 @@
 				</label>
 
 				<label>
-					充值赠送透支额度（rechargeRewardOverdraft）
+					充值赠送透支额度
 					<input
 						type="number"
 						step="0.01"
@@ -70,7 +70,7 @@
 				</label>
 
 				<label>
-					提现手续费比例（withdrawFee）
+					提现手续费比例
 					<input
 						type="number"
 						step="0.01"
@@ -80,7 +80,7 @@
 				</label>
 
 				<label>
-					默认贷款额度（defaultLoanLimit）
+					默认贷款额度
 					<input
 						type="number"
 						step="0.01"
@@ -90,7 +90,7 @@
 				</label>
 
 				<label>
-					贷款日利率（loanInterestRate）
+					贷款日利率
 					<input
 						type="number"
 						step="0.01"
@@ -100,7 +100,7 @@
 				</label>
 
 				<label>
-					贷款免息天数（loanFreeDays）
+					贷款免息天数
 					<input
 						type="number"
 						step="1"
@@ -110,7 +110,7 @@
 				</label>
 
 				<label>
-					单笔最小贷款金额（minLoanAmount）
+					单笔最小贷款金额
 					<input
 						type="number"
 						step="0.01"
@@ -120,7 +120,7 @@
 				</label>
 
 				<label>
-					单笔最大贷款金额（maxLoanAmount）
+					单笔最大贷款金额
 					<input
 						type="number"
 						step="0.01"
@@ -163,7 +163,7 @@ export default {
 	data() {
 		return {
 			API_GET: '/api/system-config',
-			API_UPDATE: '/api/system-configs',
+			API_UPDATE: '/api/system-config',
 
 			loading: false,
 			saving: false,
