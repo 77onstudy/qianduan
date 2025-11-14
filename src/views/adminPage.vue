@@ -2,13 +2,9 @@
   <div class="admin-wrapper">
     <header class="admin-header">
       <h2>店铺管理（管理员）</h2>
-      <div class="actions">
-        <button @click="loadBusinesses" :disabled="loading">
-          {{ loading ? '刷新中...' : '刷新列表' }}
-        </button>
+      
+    <button  @click="toStoredValue">储值活动管理</button>
 
-        <button class="ghost" @click="toStoredValue">储值活动管理</button>
-      </div>
 
     </header>
 
@@ -395,6 +391,7 @@ export default {
     }
   },
   toStoredValue() {
+   console.log(11)
   this.$router.push({ name: 'StoredValueManagePage' });
   },
 
@@ -416,7 +413,6 @@ export default {
 .col-span-2{grid-column:span 2}
 .form-actions{margin-top:12px;display:flex;gap:10px}
 button{padding:8px 14px;border-radius:10px;border:none;background:#0ea5e9;color:#fff;cursor:pointer}
-button.ghost{background:#eef2f7;color:#333}
 button.danger{background:#ef4444}
 .table{width:100%}
 .thead,.trow{display:grid;grid-template-columns:80px 90px 1.2fr 1fr 2fr 1.2fr 2fr 140px;gap:8px;align-items:center}
