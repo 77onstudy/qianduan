@@ -113,7 +113,7 @@ export default {
 			}
 
 			this.$axios
-				.post('/api/walletloan/loan', {
+				.post('/api/walletloan/loan/apply', {
 					money: Number(this.applyAmount)
 				})
 				.then(res => {

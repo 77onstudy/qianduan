@@ -135,7 +135,7 @@ export default {
       // 电子钱包支付：调用 /api/wallet/pay/{id}
       if (this.paymentType === 'wallet') {
         this.$axios
-          .post(`/api/wallet/pay/${this.orderId}`, null, config)
+          .patch(`/api/wallet/pay/${this.orderId}`, null, config)
           .then(res => {
             const r = res.data || {}
             if (r.success) {

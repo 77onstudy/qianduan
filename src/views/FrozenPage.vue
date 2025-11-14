@@ -155,7 +155,7 @@
       // res.data.data.walletFreeze
       loadList() {
         return this.$axios
-          .get('/api/walllet/listFreeze')
+          .get('/api/wallet/listFreeze')
           .then(res => {
             const root = res.data || {};
             if (root.success === false) {
