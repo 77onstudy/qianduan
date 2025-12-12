@@ -30,7 +30,7 @@
       </div>
 
       <!-- 积分支付区域 -->
-      <div class="points-section" v-if="points > 0">
+      <div class="points-section" >
         <h3>积分支付:</h3>
         <div class="points-info">
           <div class="points-balance">
