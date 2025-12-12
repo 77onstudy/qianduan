@@ -203,7 +203,7 @@ export default {
         const res = await this.$axios.get('/api/points');
 
         // 严格按你规定的结构读取 data.data.totalPoints
-        const total = res && res.data && res.data.data && res.data.data.totalPoints;
+        const total = res.data.data;
 
         if (total === undefined || total === null) {
           this.points = 0;
@@ -248,11 +248,11 @@ export default {
         id: this.orderId,
         number: this.pointsToUse
       }
-
+	paymentData.number=paymentData.number/100
       // 电子钱包支付：调用 /api/wallet/pay/{id}
       if (this.paymentType === 'wallet') {
         this.$axios
-          .patch(`/api/wallet/pay/${this.orderId}`, paymentData, config)
+          .patch(`/api/wallet/pay`, paymentData, config)
           .then(res => {
             const r = res.data || {}
             if (r.success) {
@@ -269,7 +269,7 @@ export default {
       } else {
         // 其它方式仍走原来的订单支付接口
         this.$axios
-          .patch(`/api/orders/pay/${this.orderId}`, paymentData, config)
+          .patch(`/api/orders/pay`, paymentData, config)
           .then(res => {
             const r = res.data || {}
             if (r.success) {

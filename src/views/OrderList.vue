@@ -42,6 +42,10 @@
               <p>配送费</p>
               <p>&#165;{{ item.business.deliveryPrice }}</p>
             </div>
+			<div>
+			<p>积分折扣</p>
+			<p>-&#165;{{item.discount }}</p>
+			</div>
           </div>
         </div>
       </template>
@@ -84,6 +88,10 @@
               <p>配送费</p>
               <p>&#165;{{ item.business.deliveryPrice }}</p>
             </div>
+			<div>
+			<p>积分折扣</p>
+			<p>-&#165;{{item.discount }}</p>
+			</div>
           </div>
         </div>
       </template>
@@ -120,6 +128,10 @@
               <p>配送费</p>
               <p>&#165;{{ item.business.deliveryPrice }}</p>
             </div>
+			<div>
+			<p>积分折扣</p>
+			<p>-&#165;{{item.discount }}</p>
+			</div>
           </div>
         </div>
       </template>

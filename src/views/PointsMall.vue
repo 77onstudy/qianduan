@@ -145,7 +145,7 @@ export default {
         const res = await this.$axios.get('/api/points');
 
         // 严格按你规定的结构读取 data.data.totalPoints
-        const total = res && res.data && res.data.data && res.data.data.totalPoints;
+        const total = res.data.data;
 
         if (total === undefined || total === null) {
           this.points = 0;
@@ -171,7 +171,7 @@ export default {
       
       try {
         // 扣减积分
-        await this.$axios.post(`/api/points/shop/${product.points}`);
+        await this.$axios.patch(`/api/points/shop/${product.points}`);
         
         // 更新积分
         await this.fetchPoints();

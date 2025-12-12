@@ -36,7 +36,7 @@
 									expense: !isIncome(item.symbol)
 								}"
 							>
-								{{ formatAmount(item.amount, item.transactionType) }}
+								{{ formatAmount(item.amount, item.symbol) }}
 							</div>
 						</div>
 
@@ -133,7 +133,7 @@ export default {
 			return 2-type;
 		},
 
-		// 类型中文说明
+		// 类型中文说明1
 		formatType(type) {
 			switch (type) {
 				case 1:

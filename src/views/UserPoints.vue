@@ -60,7 +60,7 @@ export default {
 				const res = await this.$axios.get('/api/points');
 		
 				// 严格按你规定的结构读取 data.data.totalPoints
-				const total = res && res.data && res.data.data && res.data.data.totalPoints;
+				const total =res.data.data;
 		
 				if (total === undefined || total === null) {
 					this.points = 0;

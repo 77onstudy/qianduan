@@ -154,7 +154,7 @@ export default {
       this.loading = true;
       try {
         const res = await this.$axios.get('/api/points');
-        const total = res && res.data && res.data.data && res.data.data.totalPoints;
+        const total = res.data.data;
         
         if (total === undefined || total === null) {
           this.points = 0;
