@@ -29,6 +29,60 @@
         </li>
       </div>
 
+      <!-- 积分支付区域 -->
+      <div class="points-section" v-if="points > 0">
+        <h3>积分支付:</h3>
+        <div class="points-info">
+          <div class="points-balance">
+            <span>当前积分:</span>
+            <span class="points-value">{{ points }}</span>
+          </div>
+          <div class="points-discount">
+            <span>可抵扣金额:</span>
+            <span class="discount-value">¥{{ Math.floor(points / 100) }}</span>
+          </div>
+        </div>
+        
+        <div class="points-slider-container">
+          <span class="slider-label">使用积分: {{ pointsToUse }}</span>
+          <input 
+            type="range" 
+            min="0" 
+            :max="maxPoints" 
+            step="100"
+            v-model="pointsToUse"
+            class="points-slider"
+          />
+          <div class="slider-buttons">
+            <button 
+              @click="adjustPoints(-100)" 
+              :disabled="pointsToUse <= 0"
+              class="adjust-btn"
+            >-100</button>
+            <button 
+              @click="adjustPoints(100)" 
+              :disabled="pointsToUse >= maxPoints"
+              class="adjust-btn"
+            >+100</button>
+          </div>
+        </div>
+        
+        <div class="points-summary">
+          <div class="original-price">
+            <span>订单金额:</span>
+            <span>&#165;{{ orders.orderTotal }}</span>
+          </div>
+          <div class="discount-price">
+            <span>积分抵扣:</span>
+            <span class="discount-amount">-&#165;{{ discountAmount }}</span>
+          </div>
+          <div class="final-price">
+            <span>实付金额:</span>
+            <span class="final-amount">&#165;{{ finalAmount }}</span>
+          </div>
+        </div>
+      </div>
+
       <div class="payment-section">
         <h3>支付方式:</h3>
         <div class="payment-type">
@@ -76,7 +130,27 @@ export default {
       orderId: this.$route.query.orderId,
       orders: { business: {}, list: [] },
       isShowDetailet: false,
-      paymentType: 'wechat' // 默认微信
+      paymentType: 'wechat', // 默认微信
+      points: null, // 用户当前积分
+      pointsToUse: 0, // 使用的积分数量
+      loading: false,
+      error: null
+    }
+  },
+  computed: {
+    // 最大可使用积分（取用户积分和订单金额对应积分的较小值）
+    maxPoints() {
+      const maxByPoints = this.points;
+      const maxByAmount = Math.floor(this.orders.orderTotal * 100);
+      return Math.min(maxByPoints, maxByAmount);
+    },
+    // 积分抵扣金额（每100积分抵扣1元）
+    discountAmount() {
+      return Math.floor(this.pointsToUse / 100);
+    },
+    // 实付金额
+    finalAmount() {
+      return (this.orders.orderTotal - this.discountAmount).toFixed(2);
     }
   },
   created() {
@@ -108,6 +182,9 @@ export default {
         console.error(err)
         alert('网络错误，无法获取订单信息')
       })
+
+    // 获取用户积分
+    this.fetchPoints()
   },
   mounted() {
     history.pushState(null, null, document.URL)
@@ -117,11 +194,45 @@ export default {
     window.onpopstate = null
   },
   methods: {
+    // 获取用户积分
+    async fetchPoints() {
+      this.loading = true;
+      this.error = null;
+      try {
+        // 使用项目中封装好的 this.$axios
+        const res = await this.$axios.get('/api/points');
+
+        // 严格按你规定的结构读取 data.data.totalPoints
+        const total = res && res.data && res.data.data && res.data.data.totalPoints;
+
+        if (total === undefined || total === null) {
+          this.points = 0;
+          this.error = '后端返回缺少 data.data.totalPoints';
+        } else {
+          const n = Number(total);
+          this.points = Number.isNaN(n) ? total : n;
+        }
+      } catch (err) {
+        console.error('fetchPoints error', err);
+        this.error = err?.message || '网络或服务器错误';
+        if (this.points === null) this.points = 0;
+      } finally {
+        this.loading = false;
+      }
+    },
+    
     detailetShow() {
       this.isShowDetailet = !this.isShowDetailet
     },
     selectPayment(type) {
       this.paymentType = type
+    },
+    // 调整积分数量
+    adjustPoints(amount) {
+      const newValue = this.pointsToUse + amount;
+      if (newValue >= 0 && newValue <= this.maxPoints) {
+        this.pointsToUse = newValue;
+      }
     },
     confirmPayment() {
       const token = sessionStorage.getItem('token')
@@ -132,10 +243,16 @@ export default {
       }
       const config = { headers: { Authorization: `Bearer ${token}` } }
 
+      // 构建支付数据
+      const paymentData = {
+        id: this.orderId,
+        number: this.pointsToUse
+      }
+
       // 电子钱包支付：调用 /api/wallet/pay/{id}
       if (this.paymentType === 'wallet') {
         this.$axios
-          .patch(`/api/wallet/pay/${this.orderId}`, null, config)
+          .patch(`/api/wallet/pay/${this.orderId}`, paymentData, config)
           .then(res => {
             const r = res.data || {}
             if (r.success) {
@@ -152,7 +269,7 @@ export default {
       } else {
         // 其它方式仍走原来的订单支付接口
         this.$axios
-          .patch(`/api/orders/pay/${this.orderId}`, null, config)
+          .patch(`/api/orders/pay/${this.orderId}`, paymentData, config)
           .then(res => {
             const r = res.data || {}
             if (r.success) {
@@ -318,6 +435,124 @@ h3 {
   font-weight: 500;
 }
 
+/* ===== 积分支付区域 ===== */
+.points-section {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+}
+
+.points-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  padding: 10px 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.points-balance, .points-discount {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.points-value {
+  font-weight: 600;
+  color: #1f8a70;
+}
+
+.discount-value {
+  font-weight: 600;
+  color: #e74c3c;
+}
+
+.points-slider-container {
+  margin: 20px 0;
+}
+
+.slider-label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.points-slider {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  outline: none;
+  -webkit-appearance: none;
+  margin-bottom: 15px;
+}
+
+.points-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #8faca5;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.points-slider::-webkit-slider-thumb:hover {
+  background: #7a9c94;
+  transform: scale(1.2);
+}
+
+.slider-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.adjust-btn {
+  padding: 8px 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.adjust-btn:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.adjust-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.points-summary {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.original-price, .discount-price, .final-price {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.discount-amount {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+.final-amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f8a70;
+}
+
 /* ===== 支付方式 ===== */
 .payment-section {
   background: white;
@@ -446,6 +681,10 @@ h3 {
   }
 
   .order-detailet {
+    padding: 25px;
+  }
+
+  .points-section {
     padding: 25px;
   }
 

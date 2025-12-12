@@ -144,6 +144,26 @@ const routes = [
     path: '/admin/stored-value',
     name: 'StoredValueManagePage',
     component: () => import('@/views/StoredValueManagePage.vue')
+  },
+  {
+    path: '/userPoints',
+    name: 'UserPoints',
+    component: () => import('../views/UserPoints.vue') 
+  },
+  {
+    path: '/pointsActivity',
+    name: 'PointsActivity',
+    component: () => import('../views/PointsActivity.vue')
+  },
+  {
+    path: '/pointsMall',
+    name: 'PointsMall',
+    component: () => import('../views/PointsMall.vue')
+  },
+  {
+    path: '/pointsRecord',
+    name: 'PointsRecord',
+    component: () => import('../views/PointsRecord.vue')
   }
   
   
