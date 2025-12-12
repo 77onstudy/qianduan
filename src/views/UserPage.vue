@@ -64,6 +64,11 @@
 							<i class="fa fa-credit-card icon"></i>
 							<span class="text">我的钱包</span>
 						</button>
+						
+						<button class="btn ghost-btn" @click="goToScore">
+							<i class="fa fa-credit-card icon"></i>
+							<span class="text">我的积分</span>
+						</button>
 
 						<button class="btn ghost-btn" @click="logout">
 							<i class="fa fa-sign-out icon"></i>
@@ -136,7 +141,10 @@ export default {
 		},
 		goToFavourite() {
 			this.$router.push({ path: '/favouriteBusinesses' });
-		}
+		},
+		goToScore() {
+			this.$router.push({ path: '/userPoints' });
+		},
 	}
 };
 </script>
