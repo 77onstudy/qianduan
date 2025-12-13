@@ -3,7 +3,7 @@
 		<header class="sv-header">
 			<h2>储值活动与钱包规则配置</h2>
 			<div class="actions">
-                <!-- 返回按钮（可选） -->
+				<!-- 返回按钮（可选） -->
 				<button class="ghost" @click="$router.go(-1)">
 					返回
 				</button>
@@ -16,7 +16,7 @@
 		<section class="card" v-if="loaded">
 			<h3>系统配置参数</h3>
 			<p class="desc">
-				以下配置会影响：会员资格、储值赠送、提现手续费、贷款额度与利息等规则。修改后请谨慎保存。
+				以下配置会影响：会员资格、储值赠送、提现手续费、贷款额度与利息、积分规则等。修改后请谨慎保存。
 			</p>
 
 			<div class="form-grid">
@@ -128,6 +128,57 @@
 						placeholder="如：10000.00"
 					/>
 				</label>
+
+				<!-- 新增积分相关字段 -->
+				<label>
+					积分可用时长(天)
+					<input
+						type="number"
+						step="1"
+						v-model.number="form.life"
+						placeholder="如：365"
+					/>
+				</label>
+
+				<label>
+					积分奖励门槛(消费金额)
+					<input
+						type="number"
+						step="0.01"
+						v-model.number="form.pointsRewardOverdraft"
+						placeholder="如：100.00"
+					/>
+				</label>
+
+				<label>
+					积分奖励数量
+					<input
+						type="number"
+						step="1"
+						v-model.number="form.pointsReward"
+						placeholder="如：10"
+					/>
+				</label>
+
+				<label>
+					积分兑换比例(花多少积分)
+					<input
+						type="number"
+						step="1"
+						v-model.number="form.pointsPerUnit"
+						placeholder="如：100"
+					/>
+				</label>
+
+				<label>
+					现金兑换比例(兑换多少钱)
+					<input
+						type="number"
+						step="0.01"
+						v-model.number="form.cashPerPoint"
+						placeholder="如：1.00"
+					/>
+				</label>
 			</div>
 
 			<div class="form-actions">
@@ -185,7 +236,13 @@ export default {
 				loanInterestRate: null,
 				loanFreeDays: null,
 				minLoanAmount: null,
-				maxLoanAmount: null
+				maxLoanAmount: null,
+				// 新增字段
+				life: null,
+				pointsRewardOverdraft: null,
+				pointsReward: null,
+				pointsPerUnit: null,
+				cashPerPoint: null
 			}
 		};
 	},
@@ -228,7 +285,13 @@ export default {
 						loanInterestRate: cfg.loanInterestRate ?? null,
 						loanFreeDays: cfg.loanFreeDays ?? null,
 						minLoanAmount: cfg.minLoanAmount ?? null,
-						maxLoanAmount: cfg.maxLoanAmount ?? null
+						maxLoanAmount: cfg.maxLoanAmount ?? null,
+						// 新增字段
+						life: cfg.life ?? null,
+						pointsRewardOverdraft: cfg.pointsRewardOverdraft ?? null,
+						pointsReward: cfg.pointsReward ?? null,
+						pointsPerUnit: cfg.pointsPerUnit ?? null,
+						cashPerPoint: cfg.cashPerPoint ?? null
 					};
 
 					this.loaded = true;
@@ -264,7 +327,13 @@ export default {
 				loanInterestRate: cfg.loanInterestRate ?? null,
 				loanFreeDays: cfg.loanFreeDays ?? null,
 				minLoanAmount: cfg.minLoanAmount ?? null,
-				maxLoanAmount: cfg.maxLoanAmount ?? null
+				maxLoanAmount: cfg.maxLoanAmount ?? null,
+				// 新增字段
+				life: cfg.life ?? null,
+				pointsRewardOverdraft: cfg.pointsRewardOverdraft ?? null,
+				pointsReward: cfg.pointsReward ?? null,
+				pointsPerUnit: cfg.pointsPerUnit ?? null,
+				cashPerPoint: cfg.cashPerPoint ?? null
 			};
 		},
 
@@ -282,7 +351,13 @@ export default {
 				loanInterestRate: this.form.loanInterestRate,
 				loanFreeDays: this.form.loanFreeDays,
 				minLoanAmount: this.form.minLoanAmount,
-				maxLoanAmount: this.form.maxLoanAmount
+				maxLoanAmount: this.form.maxLoanAmount,
+				// 新增字段
+				life: this.form.life,
+				pointsRewardOverdraft: this.form.pointsRewardOverdraft,
+				pointsReward: this.form.pointsReward,
+				pointsPerUnit: this.form.pointsPerUnit,
+				cashPerPoint: this.form.cashPerPoint
 			};
 		},
 
@@ -455,10 +530,36 @@ button.ghost {
 	color: #6b7280;
 }
 
-/* 小屏适配 */
+/* 响应式布局 */
+@media (min-width: 1024px) {
+	.form-grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 1023px) and (min-width: 641px) {
+	.form-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
 @media (max-width: 640px) {
 	.form-grid {
 		grid-template-columns: 1fr;
+	}
+}
+
+/* 小屏适配 */
+@media (max-width: 640px) {
+	.sv-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+	}
+	
+	.actions {
+		width: 100%;
+		justify-content: space-between;
 	}
 }
 </style>
