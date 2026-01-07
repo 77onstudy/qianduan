@@ -23,10 +23,10 @@
           :key="product.id" 
           class="product-card"
         >
-          <div class="product-image">
+         <!-- <div class="product-image">
             <img :src="product.image" :alt="product.name">
             <div v-if="product.stock === 0" class="out-of-stock">已售罄</div>
-          </div>
+          </div> -->
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
             <p class="product-description">{{ product.description }}</p>
