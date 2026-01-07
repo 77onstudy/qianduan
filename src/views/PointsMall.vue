@@ -23,10 +23,10 @@
           :key="product.id" 
           class="product-card"
         >
-         <!-- <div class="product-image">
+         <div class="product-image">
             <img :src="product.image" :alt="product.name">
             <div v-if="product.stock === 0" class="out-of-stock">已售罄</div>
-          </div> -->
+          </div>
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
             <p class="product-description">{{ product.description }}</p>
@@ -66,66 +66,66 @@ export default {
       products: [
         {
           id: 1,
-          name: '10元代金券',
-          description: '可用于商城任意商品抵扣10元',
+          name: '中性笔',
+          description: '非常好用',
           points: 100,
-          image: 'https://via.placeholder.com/200x200?text=10元代金券',
+          image: require('../assets/mall/pen.png'),
           stock: 50
         },
         {
           id: 2,
-          name: '20元代金券',
+          name: '橡皮擦',
           description: '可用于商城任意商品抵扣20元',
           points: 200,
-          image: 'https://via.placeholder.com/200x200?text=20元代金券',
+          image: require('../assets/mall/rabber.png'),
           stock: 30
         },
         {
           id: 3,
-          name: '50元代金券',
+          name: '一提卫生纸',
           description: '可用于商城任意商品抵扣50元',
-          points: 500,
-          image: 'https://via.placeholder.com/200x200?text=50元代金券',
+          points: 5000,
+          image: require('../assets/mall/paper.png'),
           stock: 20
         },
         {
           id: 4,
-          name: '100元代金券',
+          name: '牙膏一只',
           description: '可用于商城任意商品抵扣100元',
-          points: 1000,
-          image: 'https://via.placeholder.com/200x200?text=100元代金券',
+          points: 3000,
+          image: require('../assets/mall/yagao.png'),
           stock: 10
         },
         {
           id: 5,
           name: '精美笔记本',
           description: '高品质笔记本，适合办公学习',
-          points: 300,
-          image: 'https://via.placeholder.com/200x200?text=精美笔记本',
+          points: 1000,
+          image: require('../assets/mall/book.png'),
           stock: 15
         },
         {
           id: 6,
           name: '保温杯',
           description: '304不锈钢保温杯，保温12小时',
-          points: 800,
-          image: 'https://via.placeholder.com/200x200?text=保温杯',
+          points: 8000,
+          image: require('../assets/mall/cup.png'),
           stock: 8
         },
         {
           id: 7,
           name: '蓝牙耳机',
           description: '高音质蓝牙耳机，续航24小时',
-          points: 2000,
-          image: 'https://via.placeholder.com/200x200?text=蓝牙耳机',
+          points: 20000,
+          image: require('../assets/mall/earphone.png'),
           stock: 5
         },
         {
           id: 8,
           name: '智能手环',
           description: '健康监测，运动追踪，防水设计',
-          points: 1500,
-          image: 'https://via.placeholder.com/200x200?text=智能手环',
+          points: 15000,
+          image: require('../assets/mall/ximiao.png'),
           stock: 3
         }
       ]

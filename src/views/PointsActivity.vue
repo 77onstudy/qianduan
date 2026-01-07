@@ -24,8 +24,7 @@
       <div class="game-area">
         <div class="wheel-box">
           <div class="wheel-border">
-            <div class="wheel-body" :style="wheelStyle">
-              </div>
+            <div class="wheel-body" :style="wheelStyle"></div>
           </div>
           <div class="pointer-container">
             <div class="pointer-arrow"></div>
@@ -77,8 +76,9 @@ export default {
       loading: false,
       isSpinning: false,
       records: [],
-      // 8个扇区配置 (注意颜色搭配)
+      // 奖项配置
       prizeItems: [],
+      // 转盘当前的旋转角度（累加值）
       rotateAngle: 0,
     };
   },
@@ -86,13 +86,13 @@ export default {
     displayPoints() {
       return this.points === null ? '--' : this.points;
     },
-    // 动态生成圆锥渐变背景
+    // 生成圆锥渐变背景
     wheelBackground() {
-      // 这里的逻辑是将 prizeItems 里的颜色拼接成 CSS conic-gradient 字符串
-      // 例如: conic-gradient(#red 0% 12.5%, #blue 12.5% 25%, ...)
       let gradientStr = 'conic-gradient(';
       this.prizeItems.forEach((item, index) => {
-        const start = index * 12.5; // 100% / 8 = 12.5%
+        // 每个扇区 45度 (360/8)
+        // index 0: 0% - 12.5% (对应 0度 - 45度)
+        const start = index * 12.5; 
         const end = (index + 1) * 12.5;
         gradientStr += `${item.color} ${start}% ${end}%`;
         if (index < this.prizeItems.length - 1) gradientStr += ', ';
@@ -104,8 +104,9 @@ export default {
       return {
         background: this.wheelBackground,
         transform: `rotate(${this.rotateAngle}deg)`,
+        // 5秒动画，先慢后快再慢
         transition: this.isSpinning 
-          ? 'transform 4s cubic-bezier(0.2, 0.8, 0.1, 1)' // 顺滑的物理减速效果
+          ? 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)' 
           : 'none'
       };
     }
@@ -118,17 +119,17 @@ export default {
   },
   methods: {
     initPrizeItems() {
-      // 定义8个奖项和对应的颜色
-      // 颜色选取了比较柔和但区分度高的色板
+      // 这里对应 8 个扇区，index 0 到 7
+      // 这里的颜色和位置是写死的，你可以随意改积分
       this.prizeItems = [
-        { points: 10, displayText: '10 积分', color: '#FFAB91' },   // 浅红
-        { points: 0, displayText: '谢谢参与', color: '#CFD8DC' },    // 灰色
-        { points: 20, displayText: '20 积分', color: '#FFE082' },   // 浅橙
-        { points: 100, displayText: '100 积分', color: '#80CBC4' }, // 青色
-        { points: 10, displayText: '10 积分', color: '#F48FB1' },   // 粉色
-        { points: 50, displayText: '50 积分', color: '#9FA8DA' },   // 浅紫
-        { points: 200, displayText: '200 积分', color: '#CE93D8' }, // 紫色
-        { points: 1000, displayText: '1000 积分', color: '#FFCC80' } // 金色
+        { points: 0, displayText: '谢谢参与', color: '#CFD8DC' },
+		{ points: 10, displayText: '10 积分', color: '#FFAB91' },   // Index 0
+        { points: 20, displayText: '20 积分', color: '#FFE082' },   // Index 2
+        { points: 50, displayText: '50 积分', color: '#80CBC4' }, // Index 3
+        { points: 100, displayText: '100 积分', color: '#F48FB1' },   // Index 4
+        { points: 200, displayText: '200 积分', color: '#9FA8DA' },   // Index 5
+        { points: 500, displayText: '500 积分', color: '#CE93D8' }, // Index 6
+        { points: 1000, displayText: '1000 积分', color: '#ff5c5f' } // Index 7
       ];
     },
 
@@ -138,29 +139,46 @@ export default {
       this.isSpinning = true;
 
       try {
+        // 1. 先扣分
         await this.$axios.patch('/api/points/shop/50');
         
-        // 随机选择结果
-        const prizeIndex = Math.floor(Math.random() * 8);
+        // 2. 随机抽取一个索引 (0-7)
+        // 这里完全随机，如果你想控制概率，可以改这里的逻辑
+        const prizeIndex = Math.floor(Math.random() * 8); 
         const prize = this.prizeItems[prizeIndex];
 
-        // 计算旋转角度
-        // 1. 基础旋转 6 圈 (360 * 6)
-        // 2. 目标偏移: 360 - (index * 45) -> 让扇区起始线对准0度
-        // 3. 居中修正: - 22.5 -> 让指针指在扇区中间
-        const basicRotate = 360 * 6;
-        const targetOffset = 360 - (prizeIndex * 45);
-        const centerCorrection = -22.5;
+        // 3. 计算旋转角度 (核心逻辑修改：简单粗暴版)
+        // 目标：我们要让第 prizeIndex 个扇区转到最上面 (0度位置)
+        // 每个扇区占 45度。
+        // Index 0 的中心在 22.5度。要让它去 0度，需要转 -22.5度 (即 337.5度)。
+        // Index 1 的中心在 67.5度。要让它去 0度，需要转 -67.5度 (即 292.5度)。
+        
+        // 公式：目标绝对角度 = 360 - (index * 45 + 22.5)
+        const targetBaseAngle = 360 - (prizeIndex * 45 + 22.5);
 
-        this.rotateAngle = this.rotateAngle + basicRotate + targetOffset + centerCorrection;
+        // 获取当前转盘已经转到的位置 (对360取余)
+        const currentMod = this.rotateAngle % 360;
 
-        // 动画结束回调
+        // 计算我们还需要转多少度才能到达目标
+        let rotationDiff = targetBaseAngle - currentMod;
+
+        // 保证是顺时针转 (如果是负数，说明目标在当前位置后面，加上360绕一圈过去)
+        if (rotationDiff < 0) {
+          rotationDiff += 360;
+        }
+
+        // 加上额外的圈数 (5圈 = 1800度) 制造旋转效果
+        // 最终角度 = 当前角度 + 还需要转的差值 + 多转的5圈
+        this.rotateAngle += rotationDiff + (360 * 5);
+
+        // 4. 等待动画结束 (5秒)
         setTimeout(async () => {
+          // 结算
           if (prize.points > 0) {
             await this.$axios.patch(`/api/points/activity/${prize.points}`);
             alert(`恭喜！指针停在【${prize.displayText}】区，获得 ${prize.points} 积分！`);
           } else {
-            alert('指针停在灰色区域，很遗憾未中奖，下次好运！');
+            alert('很遗憾，指针停在灰色区域，未中奖。');
           }
           
           await this.fetchPoints();
@@ -172,12 +190,12 @@ export default {
           if (this.records.length > 5) this.records.pop();
           
           this.isSpinning = false;
-        }, 4000); // 必须与 CSS transition 时间一致
+        }, 5000); 
 
       } catch (err) {
         console.error(err);
         this.isSpinning = false;
-        alert('网络错误，请稍后重试');
+        alert('网络错误或积分不足');
       }
     },
     
@@ -186,9 +204,17 @@ export default {
       this.loading = true;
       try {
         const res = await this.$axios.get('/api/points');
-        const total = res?.data?.data?.totalPoints;
-        this.points = (total !== undefined && total !== null) ? Number(total) : 0;
-      } catch (err) { this.points = 0; } finally { this.loading = false; }
+        // 针对你提供的后端格式: { "data": 2014.00, ... }
+        if (res.data && res.data.success) {
+          this.points = Number(res.data.data);
+        } else {
+          this.points = 0;
+        }
+      } catch (err) { 
+        this.points = 0; 
+      } finally { 
+        this.loading = false; 
+      }
     },
 
     formatTime(timeStr) {
@@ -219,7 +245,7 @@ export default {
 
 /* 积分面板 */
 .dashboard-card {
-  background: linear-gradient(135deg, #789a94, #789a94);
+  background: linear-gradient(135deg, #789a94, #5a7570);
   border-radius: 16px;
   padding: 20px;
   color: #fff;
@@ -240,7 +266,7 @@ export default {
 }
 .refresh-btn:hover { background: rgba(255,255,255,0.1); }
 
-/* --- 抽奖区域 (核心布局) --- */
+/* --- 抽奖区域 --- */
 .lottery-section { 
   background: #fff; 
   border-radius: 16px; 
@@ -255,33 +281,34 @@ export default {
 
 .game-area {
   display: flex;
-  flex-direction: row; /* 左右排列 */
+  flex-direction: row;
   align-items: center;
   justify-content: space-around;
   gap: 20px;
 }
 
-/* 1. 左侧转盘 */
+/* 左侧转盘 */
 .wheel-box {
   position: relative;
   width: 240px;
   height: 240px;
-  flex-shrink: 0; /* 防止被压缩 */
+  flex-shrink: 0;
 }
 
 .wheel-border {
   width: 100%; height: 100%;
   border-radius: 50%;
-  border: 8px solid #f0fdf9; /* 外圈装饰色 */
+  border: 8px solid #f0fdf9;
   box-shadow: 0 0 0 1px #e0e0e0, inset 0 0 10px rgba(0,0,0,0.1);
   box-sizing: border-box;
   overflow: hidden;
+  position: relative; /* 确保子元素定位准确 */
 }
 
 .wheel-body {
   width: 100%; height: 100%;
   border-radius: 50%;
-  /* 这里的 background 由 computed 属性 wheelBackground 动态生成 */
+  /* 这里的背景由 JS 动态生成 */
 }
 
 /* 指针 */
@@ -316,7 +343,7 @@ export default {
 .go-btn:active:not(:disabled) { transform: scale(0.95); }
 .go-btn:disabled { background: #b0b0b0; cursor: not-allowed; }
 
-/* 2. 右侧图例 */
+/* 右侧图例 */
 .legend-box {
   flex: 1;
   background: #f8fafc;
@@ -325,35 +352,11 @@ export default {
   min-width: 120px;
 }
 .legend-title { font-size: 12px; color: #64748b; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
-
-.legend-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  font-size: 12px;
-}
-
-.color-dot {
-  width: 12px; height: 12px;
-  border-radius: 4px;
-  margin-right: 8px;
-  border: 1px solid rgba(0,0,0,0.1);
-}
-
+.legend-list { display: flex; flex-direction: column; gap: 6px; }
+.legend-item { display: flex; align-items: center; font-size: 12px; }
+.color-dot { width: 12px; height: 12px; border-radius: 4px; margin-right: 8px; border: 1px solid rgba(0,0,0,0.1); }
 .prize-name { color: #334155; flex: 1; }
-.prize-tag {
-  font-size: 10px;
-  background: #fef3c7;
-  color: #d97706;
-  padding: 1px 4px;
-  border-radius: 4px;
-  transform: scale(0.9);
-}
+.prize-tag { font-size: 10px; background: #fef3c7; color: #d97706; padding: 1px 4px; border-radius: 4px; transform: scale(0.9); }
 
 /* 记录列表 */
 .records-card {
@@ -365,7 +368,6 @@ export default {
 .card-header-line { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }
 .card-header-line h3 { margin: 0; font-size: 15px; color: #333; }
 .subtitle { font-size: 12px; color: #999; }
-
 .record-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
 .time { color: #94a3b8; }
 .result { display: flex; gap: 6px; font-weight: 500; }
@@ -374,19 +376,10 @@ export default {
 .loose { color: #94a3b8; }
 .empty-state { text-align: center; color: #cbd5e1; padding: 10px 0; font-size: 12px; }
 
-/* 移动端适配：竖排 */
 @media (max-width: 480px) {
-  .game-area {
-    flex-direction: column;
-  }
-  .legend-box {
-    width: 100%;
-    display: grid;
-    /* 移动端图例变两列 */
-    grid-template-columns: 1fr 1fr; 
-    gap: 8px;
-  }
-  .legend-list { display: contents; } /* 让grid直接作用于item */
+  .game-area { flex-direction: column; }
+  .legend-box { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .legend-list { display: contents; }
   .legend-title { grid-column: 1 / -1; }
 }
 </style>
