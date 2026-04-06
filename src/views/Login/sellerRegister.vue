@@ -1,350 +1,38 @@
 <template>
-	<div class="wrapper">
-		<!-- header部分 -->
-		<header>
-			<p>商家注册</p>
-		</header>
-
-		<!-- 表单部分 -->
-		<div class="form-box">
-			<li>
-				<div class="title">
-					商家名称：
-				</div>
-				<div class="content">
-					<input type="text" @blur="checkSellerId" v-model="seller.sellerId" placeholder="名字">
-				</div>
-			</li>
-			<li>
-				<div class="title">
-					店名：
-				</div>
-				<div class="content">
-					<input type="text"  v-model="seller.businessName" placeholder="请输入店名">
-				</div>
-			</li>
-			<li>
-				<div class="title">
-					密码：
-				</div>
-				<div class="content">
-					<input type="password" v-model="seller.password" placeholder="密码">
-				</div>
-			</li>
-			<li>
-				<div class="title">
-					确认密码：
-				</div>
-				<div class="content">
-					<input type="password" v-model="confirmPassword" placeholder="确认密码">
-				</div>
-			</li>
-		</div>
-
-		<div class="button-login">
-			<button @click="register">注册</button>
-		</div>
-
-		<!-- 底部菜单部分 -->
-		<NavFooter></NavFooter>
-	</div>
+  <div class="page">
+    <header class="header">商家注册</header>
+    <main class="main">
+      <section class="card">
+        <p class="tip">
+          当前商家账号仍由管理员创建，前端不再直接提交钱包、积分或其它历史注册流程。
+        </p>
+        <p class="tip">
+          请先联系管理员创建商家账号，创建完成后使用商家登录入口进入系统。
+        </p>
+        <button class="primary" @click="$router.push('/sellerLogin')">前往商家登录</button>
+        <button class="secondary" @click="$router.push('/login')">返回用户登录</button>
+      </section>
+    </main>
+    <NavFooter />
+  </div>
 </template>
 
 <script>
-	import NavFooter from '@/components/NavFooter.vue';
+import NavFooter from '@/components/NavFooter.vue'
 
-	export default {
-		name: 'sellerRegister',
-		data() {
-			return {
-				user: {
-					userId: '',
-					password: '',
-					userName: '',
-					userSex: 1
-				},
-				seller:{
-					sellerId:"777",
-					businessId: null,
-					password:"777",
-					businessName:"777",
-					
-				},
-				confirmPassword: ''
-			}
-		},
-		methods: {
-			// checkSellerId() {
-			// 	this.$axios.post('SellerController/getSellerById', this.$qs.stringify({
-			// 		sellerId: this.seller.sellerId,
-			// 	})).then(response => {
-			// 		if (!response.data.code) {
-			// 			this.seller.sellerId = '';
-			// 			alert(response.data.massage);
-			// 		}
-			// 	}).catch(error => {
-			// 		console.error(error);
-			// 	});
-			// },
-			register() {
-				if (this.seller.sellerId == '') {
-					alert('商家名不能为空！');
-					return;
-				}
-				if (this.seller.businessName == '') {
-					alert('店铺名不能为空！');
-					return;
-				}
-				if (this.seller.password == '') {
-					alert('密码不能为空！');
-					return;
-				}
-				if (this.seller.password != this.confirmPassword) {
-					alert('两次输入的密码不一致！');
-					return;
-				}
-				
-
-				// 注册请求
-				this.$axios.post('SellerController/saveSeller', this.$qs.stringify({
-					sellerId : this.seller.sellerId,
-					businessName :this.seller.businessName,
-					password:this.seller.password
-				}
-
-					
-				)).then(response => {
-					if (!response.data.code) {
-						this.seller=response.data.data;
-						this.$axios.post(
-					'BusinessController/saveBusiness',
-					this.$qs.stringify({
-						businessId: this.seller.businessId,
-						businessName: this.seller.businessName,
-						businessAddress: " 商家地址",
-						businessExplain: "商家介绍",
-						businessImg: require('@/assets/super_member.png'),
-						orderTypeId: 1,
-						starPrice: 1.00,
-						deliveryPrice: 1.00,
-						remarks: "222"
-					})
-					).then(response => {
-					if (!response.data.code) {
-						this.$router.go(-1);
-					} else {
-						alert(response.data.message || "提交失败");
-					}
-					}).catch(error => {
-					console.error("请求异常:", error);
-					});
-					} else {
-						alert(response.data.massage);
-					}
-				}).catch(error => {
-					console.error(error);
-				});
-				
-			}
-		},
-		components: {
-			NavFooter
-		}
-	}
+export default {
+  name: 'SellerRegister',
+  components: { NavFooter }
+}
 </script>
 
 <style scoped>
-	/****************** 总容器 ******************/
-	.wrapper {
-		width: 100%;
-		height: 100%;
-	}
-
-	/****************** header部分 ******************/
-	.wrapper header {
-		width: 100%;
-		height: 12vw;
-		background-color: #0097FF;
-		color: #fff;
-		font-size: 4.8vw;
-		position: fixed;
-		left: 0;
-		top: 0;
-		z-index: 1000;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	/****************** 表单部分 ******************/
-	.wrapper .form-box {
-		width: 100%;
-		margin-top: 12vw;
-	}
-
-	.wrapper .form-box li {
-		box-sizing: border-box;
-		padding: 4vw 3vw 0 3vw;
-		display: flex;
-		align-items: center;
-	}
-
-	.wrapper .form-box li .title {
-		flex: 0 0 18vw;
-		font-size: 3vw;
-		font-weight: 700;
-		color: #666;
-	}
-
-	.wrapper .form-box li .content {
-		flex: 1;
-	}
-
-	.wrapper .form-box li .content input {
-		border: none;
-		outline: none;
-		width: 100%;
-		height: 4vw;
-		font-size: 3vw;
-	}
-
-	.wrapper .button-login {
-		width: 100%;
-		box-sizing: border-box;
-		padding: 4vw 3vw 0 3vw;
-	}
-
-	.wrapper .button-login button {
-		width: 100%;
-		height: 10vw;
-		font-size: 3.8vw;
-		font-weight: 700;
-		color: #fff;
-		background-color: #38CA73;
-		border-radius: 4px;
-		border: none;
-		outline: none;
-	}
-
-	.wrapper .button-register {
-		width: 100%;
-		box-sizing: border-box;
-		padding: 4vw 3vw 0 3vw;
-	}
-
-	.wrapper .button-register button {
-		width: 100%;
-		height: 10vw;
-		font-size: 3.8vw;
-		font-weight: 700;
-		color: #666;
-		background-color: #EEE;
-		border-radius: 4px;
-		border: none;
-		outline: none;
-		border: solid 1px #DDD;
-	}
-	/* ===== Desktop overrides (≥768px) ===== */
-@media (min-width: 768px) {
-  .wrapper {
-    max-width: 520px;         /* 居中窄卡片，更聚焦 */
-    margin: 0 auto;
-    padding-bottom: 64px;
-  }
-
-  /* 头部固定高度与字号 */
-  .wrapper header {
-    height: 64px;
-    font-size: 20px;
-    position: sticky;
-    top: 0;
-    left: 0;
-  }
-
-  /* 表单外层卡片化 */
-  .wrapper .form-box {
-    width: 100%;
-    margin-top: 80px;         /* 避开 header */
-    background: #fff;
-    border: 1px solid #f0f0f0;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.06);
-    padding: 8px 0;
-  }
-
-  /* 单行：改成两列布局（标签 + 输入） */
-  .wrapper .form-box li {
-    padding: 12px 20px;
-    display: grid;
-    grid-template-columns: 110px 1fr;  /* 左 110px 右自适应 */
-    align-items: center;
-    gap: 12px;
-  }
-
-  .wrapper .form-box li .title {
-    flex: unset;
-    font-size: 14px;
-    font-weight: 600;
-    color: #444;
-  }
-
-  .wrapper .form-box li .content { flex: unset; }
-
-  .wrapper .form-box li .content input {
-    width: 100%;
-    height: 44px;             /* 桌面表单常见高度 */
-    font-size: 16px;
-    padding: 0 12px;
-    border: 1px solid #e6e6e6;
-    border-radius: 8px;
-    outline: none;
-  }
-  .wrapper .form-box li .content input:focus {
-    border-color: #0097ff;
-    box-shadow: 0 0 0 3px rgba(0,151,255,.12);
-  }
-
-  /* 主按钮/次按钮：统一高度与圆角 */
-  .wrapper .button-login,
-  .wrapper .button-register,
-  .wrapper .button-toSeller {
-    padding: 16px 0 0;        /* 与卡片分离 */
-  }
-
-  .wrapper .button-login button,
-  .wrapper .button-register button,
-  .wrapper .button-toSeller button {
-    height: 44px;
-    font-size: 16px;
-    border-radius: 10px;
-  }
-
-  /* 主按钮视觉优化 */
-  .wrapper .button-login button {
-    background: #38CA73;
-    transition: filter .2s, transform .05s;
-  }
-  .wrapper .button-login button:hover { filter: brightness(.96); }
-  .wrapper .button-login button:active { transform: scale(.99); }
-
-  /* 次按钮（“我不是管理员”）更轻量 */
-  .wrapper .button-toSeller button {
-    background: #f6f7f9;
-    color: #333;
-    border: 1px solid #e6e6e6;
-  }
-
-  /* 可选：桌面隐藏底部导航（如需保留可删掉这一段） */
-  .wrapper :deep(.footer),
-  .footer {
-    display: none;
-  }
-}
-
-/* ===== Large Desktop (≥1200px) 细节微调 ===== */
-@media (min-width: 1200px) {
-  .wrapper { max-width: 560px; }
-  .wrapper .form-box li { padding: 14px 22px; }
-}
-
+.page { min-height: 100vh; background: #f5f7fa; }
+.header { height: 64px; display: flex; align-items: center; justify-content: center; background: #8faca5; color: #fff; font-size: 22px; }
+.main { display: flex; justify-content: center; padding: 40px 16px 100px; }
+.card { width: 100%; max-width: 420px; background: #fff; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.08); padding: 24px; display: grid; gap: 12px; }
+.tip { margin: 0; color: #55606f; line-height: 1.7; }
+.primary, .secondary { height: 44px; border: none; border-radius: 10px; cursor: pointer; }
+.primary { background: #8faca5; color: #fff; }
+.secondary { background: #f3f5f7; color: #445; }
 </style>

@@ -1,4 +1,3 @@
-// main.js
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -16,27 +15,21 @@ import {
   removeLocalStorage
 } from './common.js'
 
-// 创建应用实例
 const app = createApp(App)
 
-// 配置 axios
-axios.defaults.baseURL = 'http://localhost:8080/'
+axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:8080'
 
-// === 添加请求拦截器：统一给请求加上 token ===
 axios.interceptors.request.use(
   config => {
-    const token = sessionStorage.getItem('token'); // 假设你把登录成功的 JWT 存到 sessionStorage
+    const token = sessionStorage.getItem('token')
     if (token) {
-      config.headers['Authorization'] = 'Bearer ' + token;
+      config.headers.Authorization = `Bearer ${token}`
     }
-    return config;
+    return config
   },
-  error => {
-    return Promise.reject(error);
-  }
-);
+  error => Promise.reject(error)
+)
 
-// 添加全局属性 (Vue 3 方式)
 app.config.globalProperties.$axios = axios
 app.config.globalProperties.$qs = qs
 app.config.globalProperties.$getCurDate = getCurDate
@@ -46,30 +39,47 @@ app.config.globalProperties.$removeSessionStorage = removeSessionStorage
 app.config.globalProperties.$setLocalStorage = setLocalStorage
 app.config.globalProperties.$getLocalStorage = getLocalStorage
 app.config.globalProperties.$removeLocalStorage = removeLocalStorage
+app.config.globalProperties.$unwrap = response => response?.data?.data ?? null
 
-// 路由守卫
 router.beforeEach((to, from, next) => {
-  const user = sessionStorage.getItem('user')
-  const seller =sessionStorage.getItem('seller')
-  const admin =sessionStorage.getItem('admin')
-  if (!(
-    to.path === '/' || 
-    to.path === '/index' || 
-    to.path === '/businessList' || 
-    to.path === '/businessInfo' || 
-    to.path === '/login' || 
-    to.path === '/register'||
-    to.path === '/sellerLogin'||
-    to.path === '/sellerRegister'||
-    to.path === '/adminLogin'
-  )) {
-    if (user == null&&seller==null&&admin==null) {
-      router.push('/login')
-      
-    }
+  const publicPaths = new Set([
+    '/',
+    '/index',
+    '/businessList',
+    '/businessInfo',
+    '/login',
+    '/register',
+    '/sellerLogin',
+    '/sellerRegister',
+    '/adminLogin'
+  ])
+
+  if (publicPaths.has(to.path)) {
+    next()
+    return
   }
+
+  const hasLogin =
+    sessionStorage.getItem('user') ||
+    sessionStorage.getItem('seller') ||
+    sessionStorage.getItem('admin')
+
+  if (!hasLogin) {
+    next('/login')
+    return
+  }
+
+  if (to.meta?.authType === 'seller' && !sessionStorage.getItem('seller')) {
+    next('/sellerLogin')
+    return
+  }
+
+  if (to.meta?.authType === 'admin' && !sessionStorage.getItem('admin')) {
+    next('/adminLogin')
+    return
+  }
+
   next()
 })
 
-// 挂载应用
 app.use(router).mount('#app')
